@@ -1,84 +1,56 @@
-const products = [
-  {
-    name: "No. 01 White Tea",
-    note: "white tea, fig leaf, clean cedar",
-    family: "Fresh",
-    burn: "45 hr burn",
-    tone: "mist",
-  },
-  {
-    name: "No. 02 Amber Veil",
-    note: "amber resin, saffron, smoked vanilla",
-    family: "Warm",
-    burn: "48 hr burn",
-    tone: "amber",
-  },
-  {
-    name: "No. 03 Sage Linen",
-    note: "clary sage, sun-warmed linen, vetiver",
-    family: "Herbal",
-    burn: "45 hr burn",
-    tone: "sage",
-  },
-  {
-    name: "No. 04 Neroli Stone",
-    note: "neroli, rainwater, pale musk",
-    family: "Citrus",
-    burn: "42 hr burn",
-    tone: "stone",
-  },
-  {
-    name: "No. 05 Velvet Fig",
-    note: "black fig, violet leaf, tonka",
-    family: "Fruit",
-    burn: "46 hr burn",
-    tone: "fig",
-  },
-  {
-    name: "No. 06 Cedar Smoke",
-    note: "cedar ember, birch tar, cardamom",
-    family: "Woody",
-    burn: "50 hr burn",
-    tone: "cedar",
-  },
-];
+import Link from "next/link";
+import { products } from "./lib/products";
 
 const reviews = [
-  "The throw is elegant without taking over the room.",
-  "Looks beautiful unlit and even better during a slow dinner.",
-  "A candle that actually feels considered from scent to vessel.",
+  {
+    quote: "The throw is elegant without taking over the room.",
+    name: "Eloise R.",
+    place: "Copenhagen",
+  },
+  {
+    quote: "Looks beautiful unlit and even better during a slow dinner.",
+    name: "Marguerite A.",
+    place: "Lisbon",
+  },
+  {
+    quote: "A candle that actually feels considered from scent to vessel.",
+    name: "Theo M.",
+    place: "Brooklyn",
+  },
 ];
 
-export default function Home() {
+function Stars() {
   return (
-    <main>
-      <header className="announcement">
-        Spring pours now resting in the Neuvesca studio
-      </header>
+    <span className="stars" aria-label="Five out of five">
+      <span>★</span>
+      <span>★</span>
+      <span>★</span>
+      <span>★</span>
+      <span>★</span>
+    </span>
+  );
+}
 
-      <nav className="nav" aria-label="Main navigation">
-        <a href="#shop">Scents</a>
-        <a href="#ritual">Ritual</a>
-        <div className="brand">neuvesca</div>
-        <a href="#journal">Studio</a>
-        <a href="#letter">Letter</a>
-      </nav>
+export default function Home() {
+  const featured = products.slice(0, 3);
 
+  return (
+    <>
       <section className="hero">
         <div className="heroCopy">
           <p className="eyebrow">Poured in small luminous batches</p>
           <h1>Fragrance for rooms that deserve a softer pulse.</h1>
-          <p>
+          <p className="lede">
             Neuvesca crafts scented candles for lingering evenings, fresh sheets,
             and the quiet minutes that make a place feel personal.
           </p>
           <div className="heroActions">
-            <a className="button primary" href="#shop">
+            <Link className="button primary" href="/shop">
               Explore scents
-            </a>
-            <a className="button secondary" href="#ritual">
-              Find a ritual
-            </a>
+            </Link>
+            <Link className="button secondary" href="/about">
+              Our studio
+            </Link>
           </div>
           <div className="heroPanel">
             <span>Current atmosphere</span>
@@ -102,16 +74,16 @@ export default function Home() {
             <p className="eyebrow">Scent library</p>
             <h2>The Neuvesca cabinet.</h2>
           </div>
-          <a href="#ritual">Choose by mood</a>
+          <Link className="sectionLink" href="/shop">View all scents</Link>
         </div>
         <div className="productGrid">
-          {products.map((product) => (
+          {featured.map((product) => (
             <article className="productCard" key={product.name}>
-              <div className="productMeta">
-                <span>{product.family}</span>
-                <span>{product.burn}</span>
-              </div>
               <div className={`productVisual ${product.tone}`}>
+                <div className="productMeta">
+                  <span>{product.family}</span>
+                  <span>{product.burn}</span>
+                </div>
                 <div className="candle">
                   <span>neuvesca</span>
                 </div>
@@ -120,7 +92,7 @@ export default function Home() {
                 <h3>{product.name}</h3>
                 <p>{product.note}</p>
                 <div>
-                  <span>{product.family} atmosphere</span>
+                  <span>{product.price}</span>
                   <button type="button">View notes</button>
                 </div>
               </div>
@@ -130,9 +102,13 @@ export default function Home() {
       </section>
 
       <section className="ritual" id="ritual">
-        <div>
+        <div className="ritualIntro">
           <p className="eyebrow">Scent finder</p>
           <h2>Choose by the hour you want to keep.</h2>
+          <p>
+            A small guide for matching fragrance to the room, the light, and the
+            time of day you most want to soften.
+          </p>
         </div>
         <div className="ritualGrid">
           <article>
@@ -163,29 +139,28 @@ export default function Home() {
             cotton wick, and a glass form intended to stay useful after the last
             burn.
           </p>
-          <a href="#shop">Explore the collection</a>
+          <Link className="storyLink" href="/about">Read our story</Link>
         </div>
       </section>
 
       <section className="reviews" aria-label="Customer reviews">
-        {reviews.map((review) => (
-          <blockquote key={review}>{review}</blockquote>
-        ))}
-      </section>
-
-      <footer className="footer" id="letter">
-        <div>
-          <div className="brand">neuvesca</div>
-          <p>Quiet fragrance for considered spaces.</p>
+        <div className="reviewsHeader">
+          <p className="eyebrow">Kept rooms, kept letters</p>
+          <h2>Quiet words from quieter homes.</h2>
         </div>
-        <form>
-          <label htmlFor="email">Join the scent letter</label>
-          <div>
-            <input id="email" type="email" placeholder="Email address" />
-            <button type="submit">Subscribe</button>
-          </div>
-        </form>
-      </footer>
-    </main>
+        <div className="reviewsGrid">
+          {reviews.map((review) => (
+            <figure key={review.quote}>
+              <Stars />
+              <blockquote>&ldquo;{review.quote}&rdquo;</blockquote>
+              <figcaption>
+                <span>{review.name}</span>
+                <span>{review.place}</span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+    </>
   );
 }
