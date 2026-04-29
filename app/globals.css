@@ -732,6 +732,129 @@ p {
   max-width: 44rem;
 }
 
+/* ─── Auth ───────────────────────────────────────────── */
+.authSection {
+  background: var(--cream);
+  display: grid;
+  min-height: 72vh;
+  padding: clamp(4rem, 7vw, 7rem) clamp(1.25rem, 5vw, 5.5rem);
+  place-items: center;
+}
+
+.authCard,
+.protectedPanel {
+  background: var(--porcelain);
+  box-shadow: var(--shadow-soft);
+  display: grid;
+  gap: 1.6rem;
+  max-width: 520px;
+  padding: clamp(2rem, 4vw, 3.5rem);
+  width: 100%;
+}
+
+.authIntro h1 {
+  font-size: clamp(2.5rem, 5vw, 4.6rem);
+  margin-bottom: 1.1rem;
+  max-width: 10ch;
+}
+
+.authIntro .lede {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.authForm {
+  display: grid;
+  gap: 1.35rem;
+}
+
+.authForm label {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.authForm label > span,
+.protectedDetails dt {
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.authForm input {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 1rem;
+  font-weight: 300;
+  padding: 0.85rem 0;
+  width: 100%;
+}
+
+.authForm input:focus {
+  border-bottom-color: var(--ink);
+  outline: none;
+}
+
+.authForm input::placeholder {
+  color: var(--muted-soft);
+  font-style: italic;
+}
+
+.authMessage {
+  background: var(--cream);
+  border-left: 2px solid var(--sage);
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  padding: 0.9rem 1rem;
+}
+
+.authError {
+  border-left-color: var(--clay);
+}
+
+.authSwitch {
+  color: var(--muted);
+  font-size: 0.92rem;
+  text-align: center;
+}
+
+.authSwitch a {
+  border-bottom: 1px solid var(--ink);
+  color: var(--ink);
+}
+
+.protectedPanel {
+  margin: 2.4rem auto 0;
+  text-align: left;
+}
+
+.protectedDetails {
+  display: grid;
+  gap: 1.2rem;
+  margin: 0;
+}
+
+.protectedDetails div {
+  border-bottom: 1px solid var(--line-soft);
+  display: grid;
+  gap: 0.3rem;
+  padding-bottom: 1rem;
+}
+
+.protectedDetails dd {
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  font-style: italic;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
 /* ─── Shop bar / filters ───────────────────────────────────── */
 .shopBar {
   display: flex;
