@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { products } from "../lib/products";
+import { products } from "@/lib/products";
 
 export const metadata: Metadata = {
   title: "Shop | Neuvesca",
