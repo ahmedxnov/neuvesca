@@ -1,59 +1,26 @@
-"use client";
+import { createClient } from "@/lib/supabase/server";
+import SiteHeaderNav from "./SiteHeaderNav";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-
-const links = [
-  { href: "/shop", label: "Shop" },
-  { href: "/about", label: "Studio" },
-];
-
-const rightLinks = [
-  { href: "/#ritual", label: "Ritual" },
-  { href: "/contact", label: "Contact" },
-];
-
-export default function SiteHeader() {
-  const pathname = usePathname();
-
-  const isActive = (href: string) => {
-    if (href.startsWith("/#")) return false;
-    if (href === "/") return pathname === "/";
-    return pathname === href || pathname.startsWith(`${href}/`);
-  };
+async function getCartCount(userId: string) {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from("cart_items")
+    .select("quantity")
+    .eq("user_id", userId);
 
   return (
-    <>
-      <div className="announcement">
-        Spring pours now resting in the Neuvesca studio
-      </div>
-      <nav className="nav" aria-label="Main navigation">
-        <div className="navLinks navLeft">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={isActive(link.href) ? "active" : undefined}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
-        <Link href="/" className="brand" aria-label="Neuvesca home">
-          neuvesca
-        </Link>
-        <div className="navLinks navRight">
-          {rightLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={isActive(link.href) ? "active" : undefined}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
-      </nav>
-    </>
+    data?.reduce((total, item) => total + (Number(item.quantity) || 0), 0) ?? 0
   );
+}
+
+export default async function SiteHeader() {
+  const supabase = createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const user = session?.user;
+  const cartCount = user ? await getCartCount(user.id) : 0;
+
+  return <SiteHeaderNav cartCount={cartCount} isAuthenticated={Boolean(user)} />;
 }
