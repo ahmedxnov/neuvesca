@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { products } from "@/lib/products";
+import { listActiveProducts } from "@/lib/queries/products";
+import { formatPrice } from "@/lib/format";
 
 const reviews = [
   {
@@ -31,7 +32,8 @@ function Stars() {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const products = await listActiveProducts();
   const featured = products.slice(0, 3);
 
   return (
@@ -45,7 +47,7 @@ export default function Home() {
             and the quiet minutes that make a place feel personal.
           </p>
           <div className="heroActions">
-            <Link className="button primary" href="/shop">
+            <Link className="button primary" href="/products">
               Explore scents
             </Link>
             <Link className="button secondary" href="/about">
@@ -74,15 +76,19 @@ export default function Home() {
             <p className="eyebrow">Scent library</p>
             <h2>The Neuvesca cabinet.</h2>
           </div>
-          <Link className="sectionLink" href="/shop">View all scents</Link>
+          <Link className="sectionLink" href="/products">View all scents</Link>
         </div>
         <div className="productGrid">
           {featured.map((product) => (
-            <article className="productCard" key={product.name}>
-              <div className={`productVisual ${product.tone}`}>
+            <Link
+              className="productCard"
+              key={product.id}
+              href={`/products/${product.slug}`}
+            >
+              <div className={`productVisual ${product.tone ?? ""}`}>
                 <div className="productMeta">
                   <span>{product.family}</span>
-                  <span>{product.burn}</span>
+                  <span>{product.burn_time_hours} hr burn</span>
                 </div>
                 <div className="candle">
                   <span>neuvesca</span>
@@ -90,13 +96,13 @@ export default function Home() {
               </div>
               <div className="productInfo">
                 <h3>{product.name}</h3>
-                <p>{product.note}</p>
+                <p>{product.description}</p>
                 <div>
-                  <span>{product.price}</span>
-                  <button type="button">View notes</button>
+                  <span>{formatPrice(product.price_cents, product.currency)}</span>
+                  <span>View notes</span>
                 </div>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       </section>

@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCart } from "@/lib/cart/CartProvider";
 
 const leftLinks = [
-  { href: "/shop", label: "Shop" },
+  { href: "/products", label: "Shop" },
+  { href: "/ingredients", label: "Ingredients" },
   { href: "/about", label: "Studio" },
 ];
 
@@ -14,7 +16,7 @@ const rightLinks = [
 ];
 
 type SiteHeaderNavProps = {
-  cartCount: number;
+  initialCount: number;
   isAuthenticated: boolean;
 };
 
@@ -59,9 +61,12 @@ function NavLink({ href, label }: { href: string; label: string }) {
 }
 
 export default function SiteHeaderNav({
-  cartCount,
+  initialCount,
   isAuthenticated,
 }: SiteHeaderNavProps) {
+  const { count, isLoading } = useCart();
+  // Use server-supplied count until client cart hydrates to avoid flicker.
+  const displayCount = isLoading ? initialCount : count;
   const accountHref = isAuthenticated ? "/account" : "/login";
   const accountLabel = isAuthenticated ? "Account" : "Login";
 
@@ -94,15 +99,15 @@ export default function SiteHeaderNav({
           ))}
 
           <Link
-            aria-label={`Cart with ${cartCount} ${
-              cartCount === 1 ? "item" : "items"
+            aria-label={`Cart with ${displayCount} ${
+              displayCount === 1 ? "item" : "items"
             }`}
             className="inline-flex items-center gap-2 py-1 text-[0.72rem] font-normal uppercase tracking-[0.2em] text-[var(--ink-soft)] transition-colors hover:text-[var(--ink)]"
-            href="/checkout"
+            href="/cart"
           >
             <CartIcon />
             <span className="grid h-6 min-w-6 place-items-center rounded-full border border-[var(--line)] px-1 text-[0.65rem] tracking-normal">
-              {cartCount}
+              {displayCount}
             </span>
           </Link>
 

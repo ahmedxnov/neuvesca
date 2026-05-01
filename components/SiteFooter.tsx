@@ -16,7 +16,7 @@ export default function SiteFooter() {
         <div className="mt-7 flex flex-wrap gap-6">
           <Link
             className="border-b border-transparent pb-1 text-[0.7rem] font-normal uppercase tracking-[0.26em] text-[rgba(250,244,232,0.7)] transition-colors hover:border-[rgba(250,244,232,0.5)] hover:text-[var(--cream)]"
-            href="/shop"
+            href="/products"
           >
             Shop
           </Link>
