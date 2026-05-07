@@ -11,7 +11,7 @@ import ScentFilter from "./ScentFilter";
 export const metadata: Metadata = {
   title: "Shop | Neuvesca",
   description:
-    "The full Neuvesca scent library — six considered candles for slow rooms and quiet hours.",
+    "The full Neuvesca scent library — body serum candles for slow rooms and quiet hours.",
 };
 
 type SearchParams = { scent?: string };
@@ -29,14 +29,16 @@ export default async function ProductsPage({
 
   return (
     <>
-      <section className="pageIntro">
-        <p className="eyebrow">The collection</p>
-        <h1>The Neuvesca cabinet, in full.</h1>
-        <p className="lede">
-          Six candles, poured in small batches and shipped in reusable glass.
-          Each one is designed to soften the room it&rsquo;s burned in — nothing
-          shouts, nothing crowds.
-        </p>
+      <section className="shopHero">
+        <div className="shopHeroCopy">
+          <p className="eyebrow">The collection</p>
+          <h1>Body serum candles, hand-poured.</h1>
+          <p>
+            Light the wick, let the wax pool transform into a warm, nourishing
+            serum, and massage it into your skin. Six scents, small batches,
+            shipped in reusable glass.
+          </p>
+        </div>
       </section>
 
       <section className="shopBar">
@@ -58,10 +60,7 @@ export default async function ProductsPage({
             <p className="text-[var(--muted)]">
               Try clearing the filter to view the full cabinet.
             </p>
-            <Link
-              className="storyLink mt-6 inline-block"
-              href="/products"
-            >
+            <Link className="tertiary mt-6 inline-flex" href="/products">
               Show all scents
             </Link>
           </div>
@@ -117,7 +116,7 @@ export default async function ProductsPage({
         <span>Soy coconut wax</span>
         <span>Clean fragrance oils</span>
         <span>Reusable glass vessels</span>
-        <span>45 hour burn</span>
+        <span>40+ hour burn</span>
       </section>
     </>
   );

@@ -1,33 +1,58 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import Image from "next/image";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart/CartProvider";
-import { scentSwatchColor } from "@/lib/format";
+import { scentImageUrl, scentSwatchColor } from "@/lib/format";
 import type { ScentRow } from "@/lib/queries/products";
 
 type Props = {
   productId: string;
   primaryScents: ScentRow[];
   priceLabel: string;
+  burnTimeHours: number;
+  sizeGrams: number;
 };
 
 export default function ProductPurchasePanel({
   productId,
   primaryScents,
   priceLabel,
+  burnTimeHours,
+  sizeGrams,
 }: Props) {
   const router = useRouter();
   const { addToCart } = useCart();
   const [scentId, setScentId] = useState<string | null>(
-    primaryScents.length === 1 ? primaryScents[0].id : null,
+    primaryScents[0]?.id ?? null,
   );
   const [quantity, setQuantity] = useState(1);
   const [isPending, startTransition] = useTransition();
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
+  const [tileBusyId, setTileBusyId] = useState<string | null>(null);
+
+  const selectedScent = useMemo(
+    () => primaryScents.find((s) => s.id === scentId) ?? null,
+    [primaryScents, scentId],
+  );
 
   const canAdd = Boolean(scentId) && !adding && !isPending;
+
+  async function quickAdd(scent: ScentRow) {
+    if (tileBusyId) return;
+    setTileBusyId(scent.id);
+    setScentId(scent.id);
+    setAdded(false);
+    try {
+      await addToCart(productId, scent.id, 1);
+      setAdded(true);
+      startTransition(() => router.refresh());
+    } finally {
+      setTileBusyId(null);
+    }
+  }
 
   async function onAdd() {
     if (!scentId) return;
@@ -42,59 +67,87 @@ export default function ProductPurchasePanel({
     }
   }
 
+  const ozLabel = (sizeGrams / 28.3495).toFixed(1);
+
   return (
-    <div className="grid gap-6">
-      <fieldset className="grid gap-3">
-        <legend className="eyebrow !mb-0">Select your scent</legend>
-        <div className="flex flex-wrap gap-2">
+    <div className="grid gap-7">
+      <dl className="productSpecs" aria-label="Product specifications">
+        <div>
+          <dt>Burning Hours</dt>
+          <dd>{burnTimeHours}+ hours</dd>
+        </div>
+        <div>
+          <dt>Weight</dt>
+          <dd>
+            {ozLabel}oz / {sizeGrams}g
+          </dd>
+        </div>
+      </dl>
+
+      <fieldset className="scentPicker">
+        <legend className="scentPickerHeader">
+          <span className="eyebrow">Choose Scent</span>
+          {selectedScent && (
+            <span className="scentSelected">{selectedScent.name}</span>
+          )}
+        </legend>
+
+        <div className="scentRow">
           {primaryScents.map((s) => {
             const selected = scentId === s.id;
+            const img = scentImageUrl(s.slug);
             return (
-              <button
-                aria-pressed={selected}
-                className={[
-                  "inline-flex items-center gap-2 border px-4 py-2 text-[0.72rem] uppercase tracking-[0.22em] transition-colors",
-                  selected
-                    ? "border-[var(--ink)] bg-[var(--ink)] text-[var(--cream)]"
-                    : "border-[var(--line)] text-[var(--ink-soft)] hover:border-[var(--ink)] hover:text-[var(--ink)]",
-                ].join(" ")}
-                key={s.id}
-                onClick={() => setScentId(s.id)}
-                type="button"
-              >
-                <span
-                  aria-hidden
-                  className="inline-block h-2.5 w-2.5 rounded-full border border-[var(--line)]"
-                  style={{ background: scentSwatchColor(s.slug) }}
-                />
-                {s.name}
-              </button>
+              <div className="scentTile" key={s.id}>
+                <button
+                  aria-label={`Choose ${s.name}`}
+                  aria-pressed={selected}
+                  className="scentTileImage"
+                  onClick={() => setScentId(s.id)}
+                  type="button"
+                >
+                  {img ? (
+                    <Image
+                      alt=""
+                      fill
+                      sizes="96px"
+                      src={img}
+                    />
+                  ) : (
+                    <span className="scentTileSwatch">
+                      <span style={{ background: scentSwatchColor(s.slug) }} />
+                    </span>
+                  )}
+                </button>
+                <span className="scentTileName">{s.name}</span>
+                <button
+                  aria-label={`Add ${s.name} to bag`}
+                  className="scentTileBag"
+                  disabled={tileBusyId !== null}
+                  onClick={() => quickAdd(s)}
+                  type="button"
+                >
+                  {tileBusyId === s.id ? "…" : "+ Bag"}
+                </button>
+              </div>
             );
           })}
         </div>
-        {!scentId && (
-          <p className="text-[0.85rem] italic text-[var(--muted)]">
-            Pick a scent to enable add to cart.
-          </p>
-        )}
       </fieldset>
 
       <div className="flex items-center gap-4">
         <span className="eyebrow !mb-0">Quantity</span>
-        <div className="inline-flex items-center border border-[var(--line)]">
+        <div className="qtyStepper">
           <button
             aria-label="Decrease quantity"
-            className="px-3 py-2 text-[var(--ink-soft)] disabled:opacity-40"
             disabled={quantity <= 1}
             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
             type="button"
           >
             −
           </button>
-          <span className="min-w-8 text-center text-[0.95rem]">{quantity}</span>
+          <span>{quantity}</span>
           <button
             aria-label="Increase quantity"
-            className="px-3 py-2 text-[var(--ink-soft)] disabled:opacity-40"
             disabled={quantity >= 10}
             onClick={() => setQuantity((q) => Math.min(10, q + 1))}
             type="button"
@@ -104,19 +157,21 @@ export default function ProductPurchasePanel({
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-4 border-t border-[var(--line-soft)] pt-5">
-        <span className="[font-family:var(--serif)] text-[1.6rem] italic">
-          {priceLabel}
+      <div className="productPriceRow">
+        <span className="productPrice">{priceLabel}</span>
+        <span className="productPriceNote">
+          Ships in reusable glass · Free over €60
         </span>
-        <button
-          className="button primary disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={!canAdd}
-          onClick={onAdd}
-          type="button"
-        >
-          {adding ? "Adding…" : added ? "Added to cart" : "Add to cart"}
-        </button>
       </div>
+
+      <button
+        className="button primary full large"
+        disabled={!canAdd}
+        onClick={onAdd}
+        type="button"
+      >
+        {adding ? "Adding to bag…" : added ? "Added to bag" : "Add to bag"}
+      </button>
     </div>
   );
 }

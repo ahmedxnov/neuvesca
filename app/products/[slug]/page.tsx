@@ -33,87 +33,121 @@ export default async function ProductDetailPage({
   const priceLabel = formatPrice(product.price_cents, product.currency);
 
   return (
-    <article className="mx-auto grid max-w-[1280px] gap-[clamp(2.5rem,5vw,5rem)] px-[clamp(1.25rem,5vw,5.5rem)] py-[clamp(3rem,6vw,6rem)] lg:grid-cols-[1.05fr_0.95fr]">
-      <div className="grid gap-4">
-        <div
-          className={`productVisual ${product.tone ?? ""} relative aspect-[4/5] w-full`}
-        >
-          <div className="productMeta">
-            <span>{product.family}</span>
-            <span>{product.burn_time_hours} hr burn</span>
+    <article className="productDetail">
+      <div className="productDetailMain">
+        <aside className="productGallery">
+          <div className="productGalleryFrame">
+            {product.image_url ? (
+              <Image
+                alt={product.name}
+                fill
+                priority
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                src={product.image_url}
+              />
+            ) : (
+              <Image
+                alt={product.name}
+                fill
+                priority
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                src="/images/redsign1.jpeg"
+              />
+            )}
           </div>
-          {product.image_url ? (
-            <Image
-              alt={product.name}
-              className="object-contain"
-              fill
-              priority
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              src={product.image_url}
-            />
-          ) : (
-            <div className="candle">
-              <span>neuvesca</span>
-            </div>
-          )}
-        </div>
-      </div>
+        </aside>
 
-      <div className="flex flex-col gap-8">
-        <div>
-          <p className="eyebrow">{product.family}</p>
-          <h1 className="!max-w-none !text-[clamp(2.4rem,4.5vw,4.4rem)]">
-            {product.name}
-          </h1>
-          <p className="lede !max-w-none">{product.description}</p>
-          <p className="mt-3 text-[0.78rem] uppercase tracking-[0.24em] text-[var(--muted)]">
-            {product.size_grams}g · {product.burn_time_hours} hour burn
-          </p>
-        </div>
+        <section className="productPanel">
+          <header className="productHeader">
+            <p className="eyebrow">{product.family}</p>
+            <h1>{product.name}</h1>
+            <p className="lede">{product.description}</p>
+          </header>
 
-        <ProductPurchasePanel
-          priceLabel={priceLabel}
-          primaryScents={product.primary_scents}
-          productId={product.id}
-        />
+          <ProductPurchasePanel
+            burnTimeHours={product.burn_time_hours}
+            priceLabel={priceLabel}
+            primaryScents={product.primary_scents}
+            productId={product.id}
+            sizeGrams={product.size_grams}
+          />
 
-        <section className="grid gap-3 border-t border-[var(--line-soft)] pt-6">
-          <p className="eyebrow !mb-0">Composition</p>
-          <dl className="grid gap-3">
-            {(["top", "heart", "base"] as const).map((role) => {
-              const list = composition[role];
-              if (list.length === 0) return null;
-              return (
-                <div className="grid grid-cols-[6rem_1fr] gap-3" key={role}>
-                  <dt className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--muted)]">
-                    {role}
-                  </dt>
-                  <dd className="[font-family:var(--serif)] text-[1.05rem] italic">
-                    {list.map((s) => s.name).join(", ")}
-                  </dd>
-                </div>
-              );
-            })}
-          </dl>
-        </section>
+          <section className="grid gap-3 border-t border-[var(--line-soft)] pt-6">
+            <p className="eyebrow !mb-0">Composition</p>
+            <dl className="grid gap-3">
+              {(["top", "heart", "base"] as const).map((role) => {
+                const list = composition[role];
+                if (list.length === 0) return null;
+                return (
+                  <div className="grid grid-cols-[6rem_1fr] gap-3" key={role}>
+                    <dt className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--muted)]">
+                      {role}
+                    </dt>
+                    <dd className="[font-family:var(--serif)] text-[1.05rem] italic">
+                      {list.map((s) => s.name).join(", ")}
+                    </dd>
+                  </div>
+                );
+              })}
+            </dl>
+          </section>
 
-        <section className="grid gap-3 border-t border-[var(--line-soft)] pt-6">
-          <p className="eyebrow !mb-0">Ingredients</p>
-          <ul className="flex flex-wrap gap-x-2 gap-y-1 text-[0.95rem] text-[var(--ink-soft)]">
-            {ingredients.map((ing, idx) => (
-              <li key={ing.id}>
-                <Link
-                  className="border-b border-[var(--line)] hover:border-[var(--ink)] hover:text-[var(--ink)]"
-                  href={`/ingredients#${ing.slug}`}
+          <section className="grid gap-3 border-t border-[var(--line-soft)] pt-6">
+            <p className="eyebrow !mb-0">Ingredients</p>
+            <ul className="flex flex-wrap gap-x-3 gap-y-1.5 text-[0.95rem] text-[var(--ink-soft)]">
+              {ingredients.map((ing) => (
+                <li
+                  className="border border-[var(--line)] px-3 py-1.5"
+                  key={ing.id}
                 >
-                  {ing.name}
-                </Link>
-                {idx < ingredients.length - 1 ? "," : ""}
-              </li>
-            ))}
-          </ul>
+                  <Link
+                    className="text-[0.78rem] uppercase tracking-[0.2em] hover:text-[var(--clay)]"
+                    href={`/ingredients#${ing.slug}`}
+                  >
+                    {ing.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
         </section>
       </div>
+
+      <section
+        aria-label="The ritual"
+        className="grid items-center gap-[clamp(2.5rem,5vw,5rem)] bg-[var(--ink)] px-[clamp(1.25rem,5vw,5.5rem)] py-[clamp(4rem,7vw,7rem)] text-[var(--cream)] md:grid-cols-[0.95fr_1.05fr]"
+      >
+        <div className="relative aspect-[4/5] w-full overflow-hidden">
+          <Image
+            alt="Neuvesca candle in evening light"
+            className="object-cover"
+            fill
+            sizes="(min-width: 768px) 45vw, 90vw"
+            src="/images/redsign1.jpeg"
+          />
+        </div>
+        <div className="grid gap-5 max-w-[34rem]">
+          <p
+            className="m-0 text-[0.7rem] font-medium uppercase tracking-[0.32em]"
+            style={{ color: "var(--tan)" }}
+          >
+            The ritual
+          </p>
+          <h2 className="!m-0 [font-family:var(--serif)] text-[clamp(2rem,3.4vw,3.2rem)] !text-[var(--cream)]">
+            Light. Pool. Pour. Massage.
+          </h2>
+          <p className="text-[1rem] leading-[1.8] text-[rgba(250,244,232,0.7)]">
+            Light the wick and let the wax pool transform into a warm,
+            nourishing serum. After ten minutes, blow out the flame, let the
+            pool settle for a moment, then pour into the palm and massage into
+            skin while still tepid. The candle becomes a balm; the room keeps
+            its quiet glow.
+          </p>
+          <Link className="tertiary mt-1" href="/ingredients">
+            Read the ingredient list
+          </Link>
+        </div>
+      </section>
     </article>
   );
 }

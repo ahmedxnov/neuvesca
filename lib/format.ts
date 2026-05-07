@@ -16,3 +16,28 @@ export function scentSwatchColor(slug: string) {
   const hue = ((hash % 360) + 360) % 360;
   return `hsl(${hue} 32% 62%)`;
 }
+
+const SCENT_IMAGES: Record<string, string> = {
+  "smoked-vanilla": "/images/scents/vanilla.jpeg",
+  "amber-resin": "/images/scents/honey.jpeg",
+  "tonka": "/images/scents/honey.jpeg",
+  "saffron": "/images/scents/honey.jpeg",
+  "cedar": "/images/scents/sandalwood.jpeg",
+  "cedar-ember": "/images/scents/sandalwood.jpeg",
+  "vetiver": "/images/scents/sandalwood.jpeg",
+  "birch-tar": "/images/scents/sandalwood.jpeg",
+  "black-fig": "/images/scents/pomegranate.jpeg",
+  "violet-leaf": "/images/scents/pomegranate.jpeg",
+  "clary-sage": "/images/ingredients/leaves.jpeg",
+  "fig-leaf": "/images/ingredients/leaves.jpeg",
+  "white-tea": "/images/ingredients/leaves.jpeg",
+  "cardamom": "/images/ingredients/dates.jpeg",
+  "linen": "/images/scents/coconut.jpeg",
+  "pale-musk": "/images/scents/coconut.jpeg",
+  "rainwater": "/images/ingredients/olive-oil.jpeg",
+  "neroli": "/images/ingredients/olive-oil.jpeg",
+};
+
+export function scentImageUrl(slug: string): string | null {
+  return SCENT_IMAGES[slug] ?? null;
+}

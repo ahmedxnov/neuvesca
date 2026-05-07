@@ -19,9 +19,9 @@ export default function ContactPage() {
         </p>
       </section>
 
-      <section className="contactSection">
+      <section className="contactSection contactPanel">
         <div className="contactDetails">
-          <div>
+          <div className="contactItem">
             <p className="eyebrow">Studio</p>
             <p className="contactLine">
               14 Rue des Fleurs<br />
@@ -29,7 +29,7 @@ export default function ContactPage() {
               Paris, France
             </p>
           </div>
-          <div>
+          <div className="contactItem">
             <p className="eyebrow">Hours</p>
             <p className="contactLine">
               Tuesday — Saturday<br />
@@ -37,14 +37,14 @@ export default function ContactPage() {
               By appointment Sundays
             </p>
           </div>
-          <div>
+          <div className="contactItem">
             <p className="eyebrow">Direct</p>
             <p className="contactLine">
               <a href="mailto:hello@neuvesca.com">hello@neuvesca.com</a><br />
               <a href="tel:+33144000000">+33 1 44 00 00 00</a>
             </p>
           </div>
-          <div>
+          <div className="contactItem">
             <p className="eyebrow">Press &amp; Wholesale</p>
             <p className="contactLine">
               <a href="mailto:atelier@neuvesca.com">atelier@neuvesca.com</a>
@@ -65,19 +65,26 @@ export default function ContactPage() {
             </label>
             <label>
               <span>Email</span>
-              <input type="email" name="email" placeholder="you@example.com" required />
+              <input
+                type="email"
+                name="email"
+                placeholder="you@example.com"
+                required
+              />
             </label>
           </div>
 
           <label>
             <span>Subject</span>
-            <select name="subject" defaultValue="general">
-              <option value="general">A general question</option>
-              <option value="order">An order or shipping note</option>
-              <option value="custom">A custom pour</option>
-              <option value="wholesale">Wholesale &amp; stockists</option>
-              <option value="press">Press</option>
-            </select>
+            <span className="fancySelect">
+              <select name="subject" defaultValue="general">
+                <option value="general">A general question</option>
+                <option value="order">An order or shipping note</option>
+                <option value="custom">A custom pour</option>
+                <option value="wholesale">Wholesale &amp; stockists</option>
+                <option value="press">Press</option>
+              </select>
+            </span>
           </label>
 
           <label>
@@ -90,7 +97,7 @@ export default function ContactPage() {
             />
           </label>
 
-          <button type="submit" className="button primary">
+          <button type="submit" className="button primary full">
             Send the note
           </button>
         </form>
