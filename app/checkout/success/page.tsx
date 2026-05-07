@@ -29,7 +29,7 @@ export default async function CheckoutSuccessPage({
   const { data: order } = await supabase
     .from("orders")
     .select(
-      "id, total_cents, currency, customer_name, shipping_address_line1, shipping_city, shipping_postal_code, shipping_country",
+      "id, total_cents, currency, customer_name, shipping_address_line1, shipping_city, shipping_postal_code, shipping_country, payment_method, status",
     )
     .eq("id", orderId)
     .eq("user_id", user.id)
@@ -43,9 +43,15 @@ export default async function CheckoutSuccessPage({
       <p className="eyebrow">Order received</p>
       <h1>Thank you, {order.customer_name?.split(" ")[0] ?? "friend"}.</h1>
       <p className="lede">
-        Your candles are being prepared. You&rsquo;ll pay{" "}
-        <strong>{formatPrice(order.total_cents, order.currency)}</strong> on
-        delivery to:
+        {order.payment_method === "stripe"
+          ? "Your card payment is being confirmed and your candles are being prepared for:"
+          : "Your candles are being prepared. You\u2019ll pay "}
+        {order.payment_method === "stripe" ? null : (
+          <>
+            <strong>{formatPrice(order.total_cents, order.currency)}</strong> on
+            delivery to:
+          </>
+        )}
       </p>
       <p className="[font-family:var(--serif)] text-[1.15rem] italic text-[var(--ink-soft)]">
         {order.shipping_address_line1}, {order.shipping_city}{" "}

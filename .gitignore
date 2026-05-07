@@ -12,6 +12,7 @@ dist/
 # local env files
 .env
 .env*.local
+supabase/.temp/
 
 # logs
 npm-debug.log*
