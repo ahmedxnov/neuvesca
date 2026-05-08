@@ -23,3 +23,6 @@ pnpm-debug.log*
 # system files
 .DS_Store
 Thumbs.db
+
+# Claude Code tooling (worktrees, settings)
+.claude/
