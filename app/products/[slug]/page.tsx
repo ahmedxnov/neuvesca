@@ -72,25 +72,29 @@ export default async function ProductDetailPage({
             sizeGrams={product.size_grams}
           />
 
-          <section className="grid gap-3 border-t border-[var(--line-soft)] pt-6">
-            <p className="eyebrow !mb-0">Composition</p>
-            <dl className="grid gap-3">
-              {(["top", "heart", "base"] as const).map((role) => {
-                const list = composition[role];
-                if (list.length === 0) return null;
-                return (
-                  <div className="grid grid-cols-[6rem_1fr] gap-3" key={role}>
-                    <dt className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--muted)]">
-                      {role}
-                    </dt>
-                    <dd className="[font-family:var(--serif)] text-[1.05rem] italic">
-                      {list.map((s) => s.name).join(", ")}
-                    </dd>
-                  </div>
-                );
-              })}
-            </dl>
-          </section>
+          {(composition.top.length > 0 ||
+            composition.heart.length > 0 ||
+            composition.base.length > 0) && (
+            <section className="grid gap-3 border-t border-[var(--line-soft)] pt-6">
+              <p className="eyebrow !mb-0">Composition</p>
+              <dl className="grid gap-3">
+                {(["top", "heart", "base"] as const).map((role) => {
+                  const list = composition[role];
+                  if (list.length === 0) return null;
+                  return (
+                    <div className="grid grid-cols-[6rem_1fr] gap-3" key={role}>
+                      <dt className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--muted)]">
+                        {role}
+                      </dt>
+                      <dd className="[font-family:var(--serif)] text-[1.05rem] italic">
+                        {list.map((s) => s.name).join(", ")}
+                      </dd>
+                    </div>
+                  );
+                })}
+              </dl>
+            </section>
+          )}
 
           <section className="grid gap-3 border-t border-[var(--line-soft)] pt-6">
             <p className="eyebrow !mb-0">Ingredients</p>

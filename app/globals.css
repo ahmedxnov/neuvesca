@@ -1634,7 +1634,7 @@ p {
 .cartLayout {
   display: grid;
   gap: clamp(2rem, 4vw, 3.5rem) clamp(2rem, 4vw, 4rem);
-  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.6fr);
+  grid-template-columns: minmax(0, 1.1fr) minmax(380px, 0.9fr);
   margin: 0 auto;
   max-width: 1200px;
   padding: clamp(2.5rem, 5vw, 5rem) clamp(1.25rem, 5vw, 5.5rem);
@@ -1760,6 +1760,16 @@ p {
   padding: clamp(1.5rem, 2.4vw, 2rem);
   position: sticky;
   top: 130px;
+}
+
+.cartSummary > * {
+  min-width: 0;
+}
+
+.cartSummary .button {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .cartSummary h3 {
@@ -2755,30 +2765,59 @@ p {
 }
 
 .adminButtonRow {
+  align-items: center;
+  border-top: 1px solid var(--admin-line-soft);
   display: flex;
   flex-wrap: wrap;
-  gap: 0.55rem;
+  gap: 0.6rem;
   justify-content: flex-end;
+  margin-top: 0.4rem;
+  padding-top: 1.1rem;
+  width: 100%;
+}
+
+.adminPageHead .adminButtonRow {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+  width: auto;
 }
 
 .adminButton {
   align-items: center;
   background: #fff;
   border: 1px solid var(--admin-line);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--admin-ink);
   cursor: pointer;
   display: inline-flex;
+  flex: 0 0 auto;
   font-family: var(--sans);
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 500;
-  gap: 0.45rem;
-  padding: 0.6rem 1rem;
-  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+  gap: 0.5rem;
+  height: 42px;
+  letter-spacing: 0.01em;
+  min-width: 7.5rem;
+  padding: 0 1.2rem;
+  text-align: center;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease,
+    box-shadow 160ms ease, transform 160ms ease;
+  white-space: nowrap;
 }
 
 .adminButton:hover:not(:disabled) {
   background: var(--admin-line-soft);
+  border-color: var(--admin-ink-soft);
+}
+
+.adminButton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.adminButton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(31, 26, 20, 0.12);
 }
 
 .adminButton:disabled {
@@ -2789,21 +2828,26 @@ p {
 .adminButton.adminButtonPrimary {
   background: var(--admin-ink);
   border-color: var(--admin-ink);
+  box-shadow: 0 6px 14px -10px rgba(31, 26, 20, 0.5);
   color: #faf4e8;
 }
 
 .adminButton.adminButtonPrimary:hover:not(:disabled) {
   background: #2c241c;
+  border-color: #2c241c;
+  box-shadow: 0 10px 20px -10px rgba(31, 26, 20, 0.55);
 }
 
 .adminButton.adminButtonDanger {
   background: #fff;
-  border-color: #d97a6c;
+  border-color: #e3b9b2;
   color: #a3402f;
 }
 
 .adminButton.adminButtonDanger:hover:not(:disabled) {
-  background: #fbe5e0;
+  background: #fbeeec;
+  border-color: #c87867;
+  color: #8b3324;
 }
 
 .adminToast {
@@ -2865,6 +2909,106 @@ p {
   color: rgba(250, 244, 232, 0.7);
 }
 
+/* Scent admin list thumbs + edit layout */
+.scentListItem {
+  align-items: center;
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: 36px 1fr;
+}
+
+.scentListThumb {
+  background: var(--admin-line-soft);
+  border-radius: 8px;
+  height: 36px;
+  overflow: hidden;
+  position: relative;
+  width: 36px;
+}
+
+.scentListThumb img {
+  object-fit: cover;
+}
+
+.scentListThumbFallback {
+  align-items: center;
+  color: var(--admin-muted);
+  display: flex;
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-style: italic;
+  height: 100%;
+  justify-content: center;
+  width: 100%;
+}
+
+.scentListMeta {
+  display: grid;
+  line-height: 1.2;
+  min-width: 0;
+}
+
+.scentListMeta small {
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+}
+
+.adminListItemActive .scentListMeta small {
+  color: rgba(250, 244, 232, 0.7);
+}
+
+.scentEditLayout {
+  align-items: start;
+  display: grid;
+  gap: 1.4rem;
+  grid-template-columns: 220px minmax(0, 1fr);
+}
+
+.scentEditFields {
+  display: grid;
+  gap: 1rem;
+}
+
+.scentEditPreview {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.scentPreviewFrame {
+  aspect-ratio: 1 / 1;
+  background: var(--admin-line-soft);
+  border: 1px solid var(--admin-line);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.scentPreviewFrame img {
+  object-fit: cover;
+}
+
+.scentPreviewEmpty {
+  align-items: center;
+  color: var(--admin-muted);
+  display: flex;
+  font-size: 0.78rem;
+  height: 100%;
+  justify-content: center;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  width: 100%;
+}
+
+.scentPreviewCaption {
+  color: var(--admin-muted);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  margin: 0;
+  text-align: center;
+  text-transform: uppercase;
+}
+
 @media (max-width: 900px) {
   .adminShell {
     grid-template-columns: 1fr;
@@ -2879,7 +3023,8 @@ p {
   .adminPanelGrid,
   .adminFormGrid,
   .adminFormGrid.adminFormGrid3,
-  .adminSplit {
+  .adminSplit,
+  .scentEditLayout {
     grid-template-columns: 1fr;
   }
 }

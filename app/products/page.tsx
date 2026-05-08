@@ -84,7 +84,7 @@ export default async function ProductsPage() {
                       <div className="productCardScents">
                         <ul aria-label={`${scentCount} scents available`}>
                           {visibleScents.map((s) => {
-                            const img = scentImageUrl(s.slug);
+                            const img = s.image_url ?? scentImageUrl(s.slug);
                             return (
                               <li key={s.id} title={s.name}>
                                 {img ? (

@@ -49,7 +49,7 @@ export default function SignupPage({ searchParams }: SignupPageProps) {
           <form className="authForm" action={signUp}>
             <label>
               <span>Full name</span>
-              <input type="text" name="fullName" placeholder="Your name" />
+              <input type="text" name="fullName" placeholder="Your name" required />
             </label>
 
             <label>
@@ -58,6 +58,19 @@ export default function SignupPage({ searchParams }: SignupPageProps) {
                 type="email"
                 name="email"
                 placeholder="you@example.com"
+                required
+              />
+            </label>
+
+            <label>
+              <span>Phone number</span>
+              <input
+                type="tel"
+                name="phone"
+                placeholder="01xxxxxxxxx"
+                inputMode="tel"
+                pattern="[0-9+\-\s]{10,16}"
+                title="Enter a phone number with 10–16 digits."
                 required
               />
             </label>

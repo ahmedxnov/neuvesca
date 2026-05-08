@@ -21,6 +21,7 @@ export type ScentRow = {
   name: string;
   description: string | null;
   family: string | null;
+  image_url: string | null;
 };
 
 export type IngredientRow = {
@@ -74,7 +75,7 @@ export async function listActiveProducts(filters?: {
     .from("products")
     .select(
       `id, slug, name, description, family, burn_time_hours, tone, size_grams, price_cents, currency, image_url, is_active,
-       product_scents ( note_role, sort_order, scents ( id, slug, name, description, family ) )`,
+       product_scents ( note_role, sort_order, scents ( id, slug, name, description, family, image_url ) )`,
     )
     .eq("is_active", true)
     .order("slug", { ascending: true });
@@ -100,7 +101,7 @@ export async function listAllPrimaryScents(): Promise<ScentRow[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("product_scents")
-    .select("scents ( id, slug, name, description, family )")
+    .select("scents ( id, slug, name, description, family, image_url )")
     .eq("note_role", "primary");
 
   if (error) throw error;
@@ -122,7 +123,7 @@ export async function getProductBySlug(
     .from("products")
     .select(
       `id, slug, name, description, family, burn_time_hours, tone, size_grams, price_cents, currency, image_url, is_active,
-       product_scents ( note_role, sort_order, scents ( id, slug, name, description, family ) ),
+       product_scents ( note_role, sort_order, scents ( id, slug, name, description, family, image_url ) ),
        product_ingredients ( sort_order, ingredients ( id, slug, name, description, safety_notes ) )`,
     )
     .eq("slug", slug)

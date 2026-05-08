@@ -109,28 +109,38 @@ export default async function Home() {
 
       <section className="ritual" id="ritual">
         <div className="ritualIntro">
-          <p className="eyebrow">Scent finder</p>
-          <h2>Choose by the hour you want to keep.</h2>
+          <p className="eyebrow">Ritual</p>
+          <h2>Light. Bathe. Indulge.</h2>
           <p>
-            A small guide for matching fragrance to the room, the light, and the
-            time of day you most want to soften.
+            Our body serum candle is rich with antioxidants, fatty acids, and
+            vitamins — leaving skin with a silky texture and a soft glow. A
+            three-step ritual to ignite your selfcare routine.
           </p>
         </div>
         <div className="ritualGrid">
           <article>
-            <span>Morning</span>
-            <h3>Clean tea, pale woods, open windows.</h3>
-            <p>No. 01 White Tea or No. 04 Neroli Stone</p>
+            <span>Light</span>
+            <h3>Light the wick and let the serum melt to the edge of the glass.</h3>
+            <p>
+              Trim the wick between uses to keep your serum clean and burning
+              properly.
+            </p>
           </article>
           <article>
-            <span>Afternoon</span>
-            <h3>Green stems, linen, a recently cleared desk.</h3>
-            <p>No. 03 Sage Linen or No. 05 Velvet Fig</p>
+            <span>Bathe</span>
+            <h3>Escape under the warmth of a shower or a bath.</h3>
+            <p>
+              Use this time to slow down and be intentional in your selfcare
+              ritual.
+            </p>
           </article>
           <article>
-            <span>Evening</span>
-            <h3>Amber, resin, low lamps, softened edges.</h3>
-            <p>No. 02 Amber Veil or No. 06 Cedar Smoke</p>
+            <span>Indulge</span>
+            <h3>Pat your skin dry, check the temperature, then pour.</h3>
+            <p>
+              Apply the warm serum to your body. Any unused serum will
+              resolidify for next time.
+            </p>
           </article>
         </div>
       </section>

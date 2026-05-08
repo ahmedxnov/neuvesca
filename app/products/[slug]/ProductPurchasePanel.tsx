@@ -86,7 +86,7 @@ export default function ProductPurchasePanel({
         <div className="scentRow">
           {primaryScents.map((s) => {
             const selected = scentId === s.id;
-            const img = scentImageUrl(s.slug);
+            const img = s.image_url ?? scentImageUrl(s.slug);
             return (
               <div className="scentTile" key={s.id}>
                 <button

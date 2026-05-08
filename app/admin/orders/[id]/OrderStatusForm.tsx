@@ -6,12 +6,11 @@ import { createClient } from "@/lib/supabase/client";
 
 const STATUSES = [
   "pending",
-  "paid",
+  "confirmed",
   "processing",
   "shipped",
   "delivered",
   "cancelled",
-  "refunded",
 ] as const;
 
 export default function OrderStatusForm({

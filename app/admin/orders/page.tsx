@@ -4,12 +4,11 @@ import { formatPrice } from "@/lib/format";
 
 const STATUS_BADGE: Record<string, string> = {
   pending: "adminBadgeWarn",
-  paid: "adminBadgeOk",
+  confirmed: "adminBadgeNeutral",
   processing: "adminBadgeNeutral",
-  shipped: "adminBadgeOk",
+  shipped: "adminBadgeNeutral",
   delivered: "adminBadgeOk",
   cancelled: "adminBadgeAlert",
-  refunded: "adminBadgeAlert",
 };
 
 function fmtDate(value: string) {

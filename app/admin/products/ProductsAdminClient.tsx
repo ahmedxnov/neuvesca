@@ -5,8 +5,6 @@ import { createClient } from "@/lib/supabase/client";
 import { uploadProductImage } from "@/lib/storage";
 import { formatPrice } from "@/lib/format";
 
-type NoteRole = "primary" | "top" | "heart" | "base";
-
 export type AdminScentOption = {
   id: string;
   slug: string;
@@ -26,9 +24,10 @@ export type AdminProduct = {
   currency: string;
   image_url: string | null;
   is_active: boolean;
+  stock_units: number;
   product_scents: Array<{
     scent_id: string;
-    note_role: NoteRole;
+    note_role: "primary" | "top" | "heart" | "base";
     sort_order: number;
   }>;
 };
@@ -37,73 +36,45 @@ type ProductForm = {
   slug: string;
   name: string;
   description: string;
-  family: string;
   burn_time_hours: string;
-  tone: string;
-  size_grams: string;
-  price_cents: string;
-  currency: string;
+  price: string; // displayed in EGP, not cents
+  stock_units: string;
   image_url: string;
-  is_active: boolean;
-  primary: string;
-  top: string;
-  heart: string;
-  base: string;
+  scent_ids: string[];
 };
 
-const inputClass =
-  "w-full border border-[#cfd6ce] bg-white px-3 py-2 text-sm text-[#1b1f1d] outline-none focus:border-[#151816]";
-const labelClass =
-  "grid gap-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-[#5f6963]";
-const roleOrder: Record<NoteRole, number> = {
-  primary: 0,
-  top: 0,
-  heart: 1,
-  base: 2,
-};
+const DEFAULT_FAMILY = "Scented";
+const DEFAULT_SIZE_GRAMS = 220;
+const DEFAULT_CURRENCY = "EGP";
 
 function blankForm(): ProductForm {
   return {
     slug: "",
     name: "",
     description: "",
-    family: "",
     burn_time_hours: "45",
-    tone: "mist",
-    size_grams: "220",
-    price_cents: "4800",
-    currency: "EGP",
+    price: "48",
+    stock_units: "100",
     image_url: "",
-    is_active: true,
-    primary: "",
-    top: "",
-    heart: "",
-    base: "",
+    scent_ids: [],
   };
 }
 
 function productToForm(product: AdminProduct): ProductForm {
-  const role = (name: NoteRole) =>
-    product.product_scents
-      .filter((row) => row.note_role === name)
-      .sort((a, b) => a.sort_order - b.sort_order)[0]?.scent_id ?? "";
+  const scent_ids = product.product_scents
+    .filter((row) => row.note_role === "primary")
+    .sort((a, b) => a.sort_order - b.sort_order)
+    .map((row) => row.scent_id);
 
   return {
     slug: product.slug,
     name: product.name,
     description: product.description,
-    family: product.family,
     burn_time_hours: String(product.burn_time_hours),
-    tone: product.tone ?? "",
-    size_grams: String(product.size_grams),
-    price_cents: String(product.price_cents),
-    currency: product.currency,
+    price: String(Math.round(product.price_cents / 100)),
+    stock_units: String(product.stock_units ?? 0),
     image_url: product.image_url ?? "",
-    is_active: product.is_active,
-    primary: role("primary"),
-    top: role("top"),
-    heart: role("heart"),
-    base: role("base"),
+    scent_ids,
   };
 }
 
@@ -143,7 +114,7 @@ export default function ProductsAdminClient({
     const { data, error } = await supabase
       .from("products")
       .select(
-        `id, slug, name, description, family, burn_time_hours, tone, size_grams, price_cents, currency, image_url, is_active,
+        `id, slug, name, description, family, burn_time_hours, tone, size_grams, price_cents, currency, image_url, is_active, stock_units,
          product_scents ( scent_id, note_role, sort_order )`,
       )
       .order("slug", { ascending: true });
@@ -168,8 +139,27 @@ export default function ProductsAdminClient({
     if (imageInputRef.current) imageInputRef.current.value = "";
   }
 
+  function newProduct() {
+    setSelectedId("");
+    setForm(blankForm());
+    setMessage("");
+    if (imageInputRef.current) imageInputRef.current.value = "";
+  }
+
   function updateField<K extends keyof ProductForm>(key: K, value: ProductForm[K]) {
     setForm((current) => ({ ...current, [key]: value }));
+  }
+
+  function toggleScent(scentId: string) {
+    setForm((current) => {
+      const has = current.scent_ids.includes(scentId);
+      return {
+        ...current,
+        scent_ids: has
+          ? current.scent_ids.filter((id) => id !== scentId)
+          : [...current.scent_ids, scentId],
+      };
+    });
   }
 
   async function saveProduct(event: React.FormEvent<HTMLFormElement>) {
@@ -185,22 +175,32 @@ export default function ProductsAdminClient({
         imageUrl = uploaded.publicUrl;
       }
 
+      const priceEgp = Number.parseFloat(form.price);
+      const priceCents = Number.isFinite(priceEgp) && priceEgp >= 0
+        ? Math.round(priceEgp * 100)
+        : 0;
+      const stockParsed = Number.parseInt(form.stock_units, 10);
+      const stockUnits = Number.isFinite(stockParsed) && stockParsed >= 0
+        ? stockParsed
+        : 0;
+
       const payload = {
         slug: slugify(form.slug || form.name),
         name: form.name.trim(),
         description: form.description.trim(),
-        family: form.family.trim(),
+        family: DEFAULT_FAMILY,
         burn_time_hours: parsePositiveInt(form.burn_time_hours, 45),
-        tone: form.tone.trim() || null,
-        size_grams: parsePositiveInt(form.size_grams, 220),
-        price_cents: parsePositiveInt(form.price_cents, 0),
-        currency: form.currency.trim().toUpperCase() || "EGP",
+        tone: null,
+        size_grams: DEFAULT_SIZE_GRAMS,
+        price_cents: priceCents,
+        currency: DEFAULT_CURRENCY,
         image_url: imageUrl,
-        is_active: form.is_active,
+        is_active: true,
+        stock_units: stockUnits,
       };
 
-      if (!payload.slug || !payload.name || !payload.family || !payload.description) {
-        setMessage("Slug, name, family, and description are required.");
+      if (!payload.slug || !payload.name || !payload.description) {
+        setMessage("Name, slug and description are required.");
         return;
       }
 
@@ -221,22 +221,21 @@ export default function ProductsAdminClient({
         productId = data.id;
       }
 
-      const { error: deleteLinksError } = await supabase
+      // Replace the primary scent list — leave any composition (top/heart/base) alone.
+      const { error: deletePrimaryError } = await supabase
         .from("product_scents")
         .delete()
-        .eq("product_id", productId);
-      if (deleteLinksError) throw deleteLinksError;
+        .eq("product_id", productId)
+        .eq("note_role", "primary");
+      if (deletePrimaryError) throw deletePrimaryError;
 
-      const links = (["primary", "top", "heart", "base"] as NoteRole[])
-        .map((role) => ({
+      if (form.scent_ids.length > 0) {
+        const links = form.scent_ids.map((scent_id, index) => ({
           product_id: productId,
-          scent_id: form[role],
-          note_role: role,
-          sort_order: roleOrder[role],
-        }))
-        .filter((link) => link.scent_id);
-
-      if (links.length > 0) {
+          scent_id,
+          note_role: "primary" as const,
+          sort_order: index,
+        }));
         const { error: insertLinksError } = await supabase
           .from("product_scents")
           .insert(links);
@@ -255,6 +254,8 @@ export default function ProductsAdminClient({
 
   async function deleteProduct() {
     if (!selectedProduct) return;
+    const ok = window.confirm(`Delete ${selectedProduct.name}?`);
+    if (!ok) return;
     setIsSaving(true);
     setMessage("");
     try {
@@ -271,7 +272,7 @@ export default function ProductsAdminClient({
       setMessage(
         error instanceof Error
           ? error.message
-          : "Could not delete product. Deactivate it instead.",
+          : "Could not delete product.",
       );
     } finally {
       setIsSaving(false);
@@ -279,225 +280,226 @@ export default function ProductsAdminClient({
   }
 
   return (
-    <div className="grid gap-6">
-      <header className="flex flex-wrap items-center justify-between gap-4 border border-[#d9ded7] bg-white p-6">
+    <>
+      <header className="adminPageHead">
         <div>
-          <p className="mb-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[#6b756f]">
-            Products
+          <p className="eyebrow">Products</p>
+          <h1>Product cabinet.</h1>
+          <p>
+            Manage the seven essentials — name, slug, description, price,
+            scents, image, burn time.
           </p>
-          <h1 className="!mb-0 !max-w-none !text-[clamp(2rem,4vw,3.4rem)]">
-            Product cabinet.
-          </h1>
         </div>
-        <button
-          className="border border-[#151816] px-4 py-3 text-[0.72rem] font-semibold uppercase tracking-[0.18em] hover:bg-[#151816] hover:text-white"
-          onClick={() => {
-            setSelectedId("");
-            setForm(blankForm());
-            setMessage("");
-          }}
-          type="button"
-        >
-          New product
-        </button>
+        <div className="adminButtonRow">
+          <button
+            className="adminButton adminButtonPrimary"
+            onClick={newProduct}
+            type="button"
+          >
+            + New product
+          </button>
+        </div>
       </header>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(320px,0.85fr)_1.15fr]">
-        <div className="overflow-hidden border border-[#d9ded7] bg-white">
-          <table className="w-full border-collapse text-left text-sm">
-            <thead className="bg-[#eef2ec] text-[0.68rem] uppercase tracking-[0.16em] text-[#5f6963]">
+      <section className="adminSplit">
+        <div className="adminTableWrap" style={{ maxHeight: "70vh", overflow: "auto" }}>
+          <table className="adminTable">
+            <thead>
               <tr>
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Price</th>
-                <th className="px-4 py-3">State</th>
+                <th>Name</th>
+                <th style={{ textAlign: "right" }}>Price</th>
               </tr>
             </thead>
             <tbody>
-              {products.map((product) => (
-                <tr
-                  className={`cursor-pointer border-t border-[#edf0ec] hover:bg-[#f7f8f6] ${
-                    product.id === selectedId ? "bg-[#f1f4ef]" : ""
-                  }`}
-                  key={product.id}
-                  onClick={() => selectProduct(product)}
-                >
-                  <td className="px-4 py-3">
-                    <strong className="block font-semibold">{product.name}</strong>
-                    <span className="text-xs text-[#6b756f]">{product.slug}</span>
-                  </td>
-                  <td className="px-4 py-3">
-                    {formatPrice(product.price_cents, product.currency)}
-                  </td>
-                  <td className="px-4 py-3">
-                    {product.is_active ? "Active" : "Hidden"}
+              {products.length === 0 ? (
+                <tr>
+                  <td className="adminEmpty" colSpan={2}>
+                    No products yet — create one.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                products.map((product) => (
+                  <tr
+                    key={product.id}
+                    onClick={() => selectProduct(product)}
+                    style={{
+                      cursor: "pointer",
+                      background:
+                        product.id === selectedId
+                          ? "var(--admin-line-soft)"
+                          : undefined,
+                    }}
+                  >
+                    <td>
+                      <div style={{ display: "grid", gap: 2, lineHeight: 1.2 }}>
+                        <span style={{ fontWeight: 500 }}>{product.name}</span>
+                        <span style={{ color: "var(--admin-muted)", fontSize: "0.75rem" }}>
+                          {product.slug}
+                        </span>
+                      </div>
+                    </td>
+                    <td style={{ textAlign: "right" }}>
+                      {formatPrice(product.price_cents, product.currency)}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
 
-        <form className="grid gap-4 border border-[#d9ded7] bg-white p-5" onSubmit={saveProduct}>
-          <div className="grid gap-4 md:grid-cols-2">
-            <label className={labelClass}>
-              Name
+        <form className="adminCard adminForm" onSubmit={saveProduct}>
+          <div className="adminPanelHead">
+            <h2>{selectedProduct ? `Edit ${selectedProduct.name}` : "New product"}</h2>
+          </div>
+
+          <div className="adminFormGrid">
+            <label className="adminFormRow">
+              <span className="adminFormLabel">Name</span>
               <input
-                className={inputClass}
-                onChange={(event) => updateField("name", event.target.value)}
+                className="adminInput"
+                onChange={(e) => updateField("name", e.target.value)}
                 required
                 type="text"
                 value={form.name}
               />
             </label>
-            <label className={labelClass}>
-              Slug
+            <label className="adminFormRow">
+              <span className="adminFormLabel">Slug</span>
               <input
-                className={inputClass}
-                onChange={(event) => updateField("slug", event.target.value)}
+                className="adminInput"
                 onBlur={() => updateField("slug", slugify(form.slug || form.name))}
-                required
+                onChange={(e) => updateField("slug", e.target.value)}
+                placeholder="auto-from-name"
                 type="text"
                 value={form.slug}
               />
             </label>
-            <label className={`${labelClass} md:col-span-2`}>
-              Description
-              <textarea
-                className={`${inputClass} min-h-24 resize-y`}
-                onChange={(event) => updateField("description", event.target.value)}
+          </div>
+
+          <label className="adminFormRow">
+            <span className="adminFormLabel">Description</span>
+            <textarea
+              className="adminTextarea"
+              onChange={(e) => updateField("description", e.target.value)}
+              required
+              value={form.description}
+            />
+          </label>
+
+          <div className="adminFormGrid adminFormGrid3">
+            <label className="adminFormRow">
+              <span className="adminFormLabel">Price (EGP)</span>
+              <input
+                className="adminInput"
+                min="0"
+                onChange={(e) => updateField("price", e.target.value)}
                 required
-                value={form.description}
+                step="0.01"
+                type="number"
+                value={form.price}
               />
             </label>
-            <label className={labelClass}>
-              Family
+            <label className="adminFormRow">
+              <span className="adminFormLabel">Burn time (hours)</span>
               <input
-                className={inputClass}
-                onChange={(event) => updateField("family", event.target.value)}
-                required
-                type="text"
-                value={form.family}
-              />
-            </label>
-            <label className={labelClass}>
-              Tone
-              <input
-                className={inputClass}
-                onChange={(event) => updateField("tone", event.target.value)}
-                type="text"
-                value={form.tone}
-              />
-            </label>
-            <label className={labelClass}>
-              Burn time
-              <input
-                className={inputClass}
+                className="adminInput"
                 min="1"
-                onChange={(event) => updateField("burn_time_hours", event.target.value)}
+                onChange={(e) => updateField("burn_time_hours", e.target.value)}
                 required
                 type="number"
                 value={form.burn_time_hours}
               />
             </label>
-            <label className={labelClass}>
-              Size grams
+            <label className="adminFormRow">
+              <span className="adminFormLabel">Units in stock</span>
               <input
-                className={inputClass}
-                min="1"
-                onChange={(event) => updateField("size_grams", event.target.value)}
-                required
-                type="number"
-                value={form.size_grams}
-              />
-            </label>
-            <label className={labelClass}>
-              Price cents
-              <input
-                className={inputClass}
+                className="adminInput"
                 min="0"
-                onChange={(event) => updateField("price_cents", event.target.value)}
+                onChange={(e) => updateField("stock_units", e.target.value)}
                 required
                 type="number"
-                value={form.price_cents}
-              />
-            </label>
-            <label className={labelClass}>
-              Currency
-              <input
-                className={inputClass}
-                maxLength={3}
-                onChange={(event) => updateField("currency", event.target.value)}
-                required
-                type="text"
-                value={form.currency}
-              />
-            </label>
-            <label className={`${labelClass} md:col-span-2`}>
-              Image URL
-              <input
-                className={inputClass}
-                onChange={(event) => updateField("image_url", event.target.value)}
-                type="url"
-                value={form.image_url}
-              />
-            </label>
-            <label className={`${labelClass} md:col-span-2`}>
-              Upload image
-              <input
-                accept="image/jpeg,image/png,image/webp,image/avif"
-                className={inputClass}
-                ref={imageInputRef}
-                type="file"
+                value={form.stock_units}
               />
             </label>
           </div>
 
-          <div className="grid gap-4 border-y border-[#edf0ec] py-4 md:grid-cols-4">
-            {(["primary", "top", "heart", "base"] as NoteRole[]).map((role) => (
-              <label className={labelClass} key={role}>
-                {role}
-                <select
-                  className={inputClass}
-                  onChange={(event) => updateField(role, event.target.value)}
-                  value={form[role]}
-                >
-                  <option value="">None</option>
-                  {scents.map((scent) => (
-                    <option key={scent.id} value={scent.id}>
-                      {scent.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ))}
+          <div className="adminFormRow">
+            <span className="adminFormLabel">
+              Scents{" "}
+              <span style={{ color: "var(--admin-muted)", fontWeight: 400, letterSpacing: 0, textTransform: "none" }}>
+                — pick which scents this product comes in
+              </span>
+            </span>
+            {scents.length === 0 ? (
+              <p className="adminEmpty" style={{ padding: "0.6rem 0" }}>
+                No scents yet — add some on the Scents page first.
+              </p>
+            ) : (
+              <div
+                style={{
+                  display: "grid",
+                  gap: "0.4rem",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+                }}
+              >
+                {scents.map((scent) => {
+                  const checked = form.scent_ids.includes(scent.id);
+                  return (
+                    <label
+                      key={scent.id}
+                      style={{
+                        alignItems: "center",
+                        background: checked ? "var(--admin-line-soft)" : "transparent",
+                        border: "1px solid var(--admin-line)",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        display: "flex",
+                        fontSize: "0.85rem",
+                        gap: "0.5rem",
+                        padding: "0.5rem 0.7rem",
+                      }}
+                    >
+                      <input
+                        checked={checked}
+                        onChange={() => toggleScent(scent.id)}
+                        type="checkbox"
+                      />
+                      <span>{scent.name}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
-          <label className="inline-flex items-center gap-3 text-sm text-[#4b554f]">
+          <div className="adminFormRow">
+            <span className="adminFormLabel">Image URL</span>
             <input
-              checked={form.is_active}
-              onChange={(event) => updateField("is_active", event.target.checked)}
-              type="checkbox"
+              className="adminInput"
+              onChange={(e) => updateField("image_url", e.target.value)}
+              placeholder="https://… (or upload below)"
+              type="url"
+              value={form.image_url}
             />
-            Active in storefront
-          </label>
+          </div>
 
-          {message && (
-            <p className="border-l-2 border-[#151816] bg-[#f7f8f6] px-3 py-2 text-sm text-[#303832]">
-              {message}
-            </p>
-          )}
+          <div className="adminFormRow">
+            <span className="adminFormLabel">Or upload an image</span>
+            <input
+              accept="image/jpeg,image/png,image/webp,image/avif"
+              className="adminInput"
+              ref={imageInputRef}
+              type="file"
+            />
+          </div>
 
-          <div className="flex flex-wrap gap-3">
-            <button
-              className="border border-[#151816] bg-[#151816] px-4 py-3 text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-white disabled:opacity-50"
-              disabled={isSaving}
-              type="submit"
-            >
-              {isSaving ? "Saving" : "Save product"}
-            </button>
+          {message && <div className="adminToast">{message}</div>}
+
+          <div className="adminButtonRow">
             {selectedProduct && (
               <button
-                className="border border-[#b44b3f] px-4 py-3 text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-[#8f332a] disabled:opacity-50"
+                className="adminButton adminButtonDanger"
                 disabled={isSaving}
                 onClick={deleteProduct}
                 type="button"
@@ -505,9 +507,16 @@ export default function ProductsAdminClient({
                 Delete
               </button>
             )}
+            <button
+              className="adminButton adminButtonPrimary"
+              disabled={isSaving}
+              type="submit"
+            >
+              {isSaving ? "Saving…" : selectedProduct ? "Save changes" : "Create product"}
+            </button>
           </div>
         </form>
-      </div>
-    </div>
+      </section>
+    </>
   );
 }

@@ -52,20 +52,15 @@ function validateProductImage(
   return file.type;
 }
 
-function createProductImagePath(
-  fileType: (typeof PRODUCT_IMAGE_ALLOWED_TYPES)[number],
-) {
-  const extension = PRODUCT_IMAGE_EXTENSIONS[fileType];
-  return `products/${crypto.randomUUID()}.${extension}`;
-}
-
-export async function uploadProductImage(
+async function uploadImage(
   file: File,
+  prefix: string,
 ): Promise<ProductImageUpload> {
   const fileType = validateProductImage(file);
 
   const supabase = createClient();
-  const path = createProductImagePath(fileType);
+  const extension = PRODUCT_IMAGE_EXTENSIONS[fileType];
+  const path = `${prefix}/${crypto.randomUUID()}.${extension}`;
   const { data, error } = await supabase.storage
     .from(PRODUCT_IMAGES_BUCKET)
     .upload(path, file, {
@@ -75,7 +70,7 @@ export async function uploadProductImage(
     });
 
   if (error) {
-    throw new Error(error.message || "Could not upload the product image.");
+    throw new Error(error.message || "Could not upload the image.");
   }
 
   const uploadedPath = data.path;
@@ -84,11 +79,19 @@ export async function uploadProductImage(
   } = supabase.storage.from(PRODUCT_IMAGES_BUCKET).getPublicUrl(uploadedPath);
 
   if (!publicUrl) {
-    throw new Error("The product image uploaded, but no public URL was returned.");
+    throw new Error("The image uploaded, but no public URL was returned.");
   }
 
   return {
     path: uploadedPath,
     publicUrl,
   };
+}
+
+export function uploadProductImage(file: File) {
+  return uploadImage(file, "products");
+}
+
+export function uploadScentImage(file: File) {
+  return uploadImage(file, "scents");
 }
