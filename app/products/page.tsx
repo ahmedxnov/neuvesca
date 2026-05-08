@@ -1,53 +1,37 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  listActiveProducts,
-  listAllPrimaryScents,
-} from "@/lib/queries/products";
-import { formatPrice } from "@/lib/format";
-import ScentFilter from "./ScentFilter";
+import { listActiveProducts } from "@/lib/queries/products";
+import { formatPrice, scentImageUrl, scentSwatchColor } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "Shop | Neuvesca",
   description:
-    "The full Neuvesca scent library — body serum candles for slow rooms and quiet hours.",
+    "The Neuvesca cabinet — body serum candles, hand-poured, each offered in several scents.",
 };
 
-type SearchParams = { scent?: string };
-
-export default async function ProductsPage({
-  searchParams,
-}: {
-  searchParams?: SearchParams;
-}) {
-  const scentSlug = searchParams?.scent;
-  const [products, scents] = await Promise.all([
-    listActiveProducts({ scentSlug }),
-    listAllPrimaryScents(),
-  ]);
+export default async function ProductsPage() {
+  const products = await listActiveProducts();
 
   return (
     <>
       <section className="shopHero">
         <div className="shopHeroCopy">
-          <p className="eyebrow">The collection</p>
+          <p className="eyebrow">The cabinet</p>
           <h1>Body serum candles, hand-poured.</h1>
           <p>
-            Light the wick, let the wax pool transform into a warm, nourishing
-            serum, and massage it into your skin. Six scents, small batches,
-            shipped in reusable glass.
+            Each candle is poured in a small batch and offered in several
+            scents. Light the wick, let the wax pool transform into a warm,
+            nourishing serum, and choose the scent that fits the room.
           </p>
         </div>
       </section>
 
       <section className="shopBar">
-        <ScentFilter
-          options={scents.map((s) => ({ slug: s.slug, name: s.name }))}
-        />
         <span className="shopCount">
-          {products.length} {products.length === 1 ? "scent" : "scents"}
+          {products.length} {products.length === 1 ? "product" : "products"}
         </span>
+        <span className="shopHint">Choose a scent at checkout</span>
       </section>
 
       <section className="section shopGrid">
@@ -55,59 +39,91 @@ export default async function ProductsPage({
           <div className="mx-auto max-w-md text-center">
             <p className="eyebrow">Nothing here yet</p>
             <h3 className="mb-3 [font-family:var(--serif)] text-[1.6rem] italic">
-              No scents match that filter.
+              The cabinet is being restocked.
             </h3>
             <p className="text-[var(--muted)]">
-              Try clearing the filter to view the full cabinet.
+              Check back shortly — new pours arrive every few weeks.
             </p>
-            <Link className="tertiary mt-6 inline-flex" href="/products">
-              Show all scents
-            </Link>
           </div>
         ) : (
           <div className="productGrid productGridFull">
-            {products.map((product) => (
-              <Link
-                className="productCard"
-                href={`/products/${product.slug}`}
-                key={product.id}
-              >
-                <div className={`productVisual ${product.tone ?? ""}`}>
-                  <div className="productMeta">
-                    <span>{product.family}</span>
-                    <span>{product.burn_time_hours} hr burn</span>
-                  </div>
-                  {product.image_url ? (
-                    <Image
-                      alt={product.name}
-                      className="object-contain"
-                      fill
-                      sizes="(min-width: 980px) 30vw, 90vw"
-                      src={product.image_url}
-                    />
-                  ) : (
-                    <div className="candle">
-                      <span>neuvesca</span>
+            {products.map((product) => {
+              const scentCount = product.primary_scents.length;
+              const visibleScents = product.primary_scents.slice(0, 5);
+              const overflow = scentCount - visibleScents.length;
+              return (
+                <Link
+                  className="productCard"
+                  href={`/products/${product.slug}`}
+                  key={product.id}
+                >
+                  <div className={`productVisual ${product.tone ?? ""}`}>
+                    <div className="productMeta">
+                      <span>{product.family}</span>
+                      <span>{product.burn_time_hours} hr burn</span>
                     </div>
-                  )}
-                </div>
-                <div className="productInfo">
-                  <h3>{product.name}</h3>
-                  <p>{product.description}</p>
-                  <div>
-                    <span>
-                      {formatPrice(product.price_cents, product.currency)}
-                    </span>
-                    <span className="text-[0.68rem] tracking-[0.22em]">
-                      {product.primary_scents.length}{" "}
-                      {product.primary_scents.length === 1
-                        ? "scent"
-                        : "scents"}
-                    </span>
+                    {product.image_url ? (
+                      <Image
+                        alt={product.name}
+                        className="object-contain"
+                        fill
+                        sizes="(min-width: 980px) 30vw, 90vw"
+                        src={product.image_url}
+                      />
+                    ) : (
+                      <div className="candle">
+                        <span>neuvesca</span>
+                      </div>
+                    )}
                   </div>
-                </div>
-              </Link>
-            ))}
+                  <div className="productInfo">
+                    <h3>{product.name}</h3>
+                    <p>{product.description}</p>
+
+                    {scentCount > 0 && (
+                      <div className="productCardScents">
+                        <ul aria-label={`${scentCount} scents available`}>
+                          {visibleScents.map((s) => {
+                            const img = scentImageUrl(s.slug);
+                            return (
+                              <li key={s.id} title={s.name}>
+                                {img ? (
+                                  <Image
+                                    alt=""
+                                    fill
+                                    sizes="28px"
+                                    src={img}
+                                  />
+                                ) : (
+                                  <span
+                                    style={{
+                                      background: scentSwatchColor(s.slug),
+                                    }}
+                                  />
+                                )}
+                              </li>
+                            );
+                          })}
+                          {overflow > 0 && (
+                            <li className="productCardScentMore">+{overflow}</li>
+                          )}
+                        </ul>
+                        <span>
+                          {scentCount} {scentCount === 1 ? "scent" : "scents"}
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="productCardFooter">
+                      <span className="productCardPrice">
+                        {formatPrice(product.price_cents, product.currency)}
+                      </span>
+                      <span className="productCardCta">View product →</span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </section>

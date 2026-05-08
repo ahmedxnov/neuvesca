@@ -72,7 +72,7 @@ function blankForm(): ProductForm {
     tone: "mist",
     size_grams: "220",
     price_cents: "4800",
-    currency: "EUR",
+    currency: "EGP",
     image_url: "",
     is_active: true,
     primary: "",
@@ -194,7 +194,7 @@ export default function ProductsAdminClient({
         tone: form.tone.trim() || null,
         size_grams: parsePositiveInt(form.size_grams, 220),
         price_cents: parsePositiveInt(form.price_cents, 0),
-        currency: form.currency.trim().toUpperCase() || "EUR",
+        currency: form.currency.trim().toUpperCase() || "EGP",
         image_url: imageUrl,
         is_active: form.is_active,
       };

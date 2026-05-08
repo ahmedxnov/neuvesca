@@ -1,5 +1,5 @@
-export function formatPrice(cents: number, currency = "EUR") {
-  return new Intl.NumberFormat("en-IE", {
+export function formatPrice(cents: number, currency = "EGP") {
+  return new Intl.NumberFormat("en-EG", {
     style: "currency",
     currency,
     minimumFractionDigits: 0,
@@ -18,6 +18,10 @@ export function scentSwatchColor(slug: string) {
 }
 
 const SCENT_IMAGES: Record<string, string> = {
+  "pomegranate": "/images/scents/pomegranate.jpeg",
+  "coconut": "/images/scents/coconut.jpeg",
+  "vanilla": "/images/scents/vanilla.jpeg",
+  "honey": "/images/scents/honey.jpeg",
   "smoked-vanilla": "/images/scents/vanilla.jpeg",
   "amber-resin": "/images/scents/honey.jpeg",
   "tonka": "/images/scents/honey.jpeg",

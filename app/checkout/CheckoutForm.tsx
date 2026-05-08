@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { formatPrice } from "@/lib/format";
 import type { ServerCartLine } from "@/lib/queries/cart";
+import { readStoredPromo, type StoredPromo } from "@/lib/cart/promo";
 import {
   createStripePaymentIntent,
   placeOrder,
@@ -90,6 +91,16 @@ export default function CheckoutForm({
   const [stripeMessage, setStripeMessage] = useState("");
   const [isStartingStripe, setIsStartingStripe] = useState(false);
   const [isConfirmingStripe, setIsConfirmingStripe] = useState(false);
+  const [promo, setPromo] = useState<StoredPromo | null>(null);
+
+  useEffect(() => {
+    setPromo(readStoredPromo());
+  }, []);
+
+  const discountCents = promo
+    ? Math.round((subtotalCents * promo.percent) / 100)
+    : 0;
+  const totalCents = Math.max(0, subtotalCents - discountCents);
 
   async function startStripePayment() {
     const form = formRef.current;
@@ -234,8 +245,13 @@ export default function CheckoutForm({
           <p className="text-[var(--ink-soft)]">
             Choose card payment now or cash on delivery.
           </p>
+          {promo && (
+            <p className="text-[0.85rem] text-[var(--ink-soft)]">
+              Promo <strong>{promo.code}</strong> applied — {promo.percent}% off (− {formatPrice(discountCents, currency)})
+            </p>
+          )}
           <p className="text-[0.85rem] text-[var(--muted)]">
-            Total due: {formatPrice(subtotalCents, currency)}
+            Total due: {formatPrice(totalCents, currency)}
           </p>
         </div>
 
@@ -280,6 +296,12 @@ export default function CheckoutForm({
         readOnly
         type="hidden"
         value={cart.map((line) => `${line.productSlug}:${line.quantity}`).join("|")}
+      />
+      <input
+        name="promo_code"
+        readOnly
+        type="hidden"
+        value={promo?.code ?? ""}
       />
     </form>
   );

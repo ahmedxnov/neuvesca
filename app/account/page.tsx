@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -50,11 +51,18 @@ export default async function AccountPage() {
             <dd>{profile?.role ?? "customer"}</dd>
           </div>
         </dl>
-        <form action={signOut}>
-          <button type="submit" className="button primary">
-            Sign out
-          </button>
-        </form>
+        <div className="protectedActions">
+          {profile?.role === "admin" && (
+            <Link className="button primary" href="/admin">
+              Go to dashboard
+            </Link>
+          )}
+          <form action={signOut}>
+            <button type="submit" className="button secondary">
+              Sign out
+            </button>
+          </form>
+        </div>
       </div>
     </section>
   );

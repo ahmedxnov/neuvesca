@@ -19,6 +19,8 @@ type CheckoutTotals = {
   cart: ServerCartLine[];
   currency: string;
   subtotalCents: number;
+  discountCents: number;
+  promoCodeId: string | null;
   shippingCents: number;
   taxCents: number;
   totalCents: number;
@@ -74,7 +76,30 @@ function validateCheckoutDetails(details: CheckoutDetails) {
   return null;
 }
 
-async function getCheckoutTotals(userId: string): Promise<CheckoutTotals> {
+async function resolvePromo(
+  supabase: ReturnType<typeof createClient>,
+  rawCode: string,
+): Promise<{ id: string; percent: number } | null> {
+  const code = rawCode.trim().toUpperCase();
+  if (!code) return null;
+  const { data } = await supabase
+    .from("promo_codes")
+    .select("id, discount_percent, starts_at, ends_at, max_uses, used_count, is_active")
+    .ilike("code", code)
+    .maybeSingle();
+  if (!data || !data.is_active) return null;
+  const now = Date.now();
+  if (data.starts_at && new Date(data.starts_at).getTime() > now) return null;
+  if (data.ends_at && new Date(data.ends_at).getTime() < now) return null;
+  if (data.max_uses != null && data.used_count >= data.max_uses) return null;
+  return { id: data.id, percent: data.discount_percent };
+}
+
+async function getCheckoutTotals(
+  userId: string,
+  promoCode: string | null,
+): Promise<CheckoutTotals> {
+  const supabase = createClient();
   const cart = await getServerCart(userId);
   if (cart.length === 0) {
     throw new Error("Your cart is empty.");
@@ -85,14 +110,27 @@ async function getCheckoutTotals(userId: string): Promise<CheckoutTotals> {
     (n, l) => n + l.quantity * l.unitPriceCents,
     0,
   );
+
+  let discountCents = 0;
+  let promoCodeId: string | null = null;
+  if (promoCode) {
+    const promo = await resolvePromo(supabase, promoCode);
+    if (promo) {
+      discountCents = Math.round((subtotalCents * promo.percent) / 100);
+      promoCodeId = promo.id;
+    }
+  }
+
   const shippingCents = 0;
   const taxCents = 0;
-  const totalCents = subtotalCents + shippingCents + taxCents;
+  const totalCents = Math.max(0, subtotalCents - discountCents) + shippingCents + taxCents;
 
   return {
     cart,
     currency,
     subtotalCents,
+    discountCents,
+    promoCodeId,
     shippingCents,
     taxCents,
     totalCents,
@@ -127,6 +165,8 @@ async function insertOrderWithItems({
         ? { stripe_payment_intent_id: stripePaymentIntentId }
         : {}),
       subtotal_cents: totals.subtotalCents,
+      discount_cents: totals.discountCents,
+      promo_code_id: totals.promoCodeId,
       shipping_cents: totals.shippingCents,
       tax_cents: totals.taxCents,
       total_cents: totals.totalCents,
@@ -267,9 +307,10 @@ export async function placeOrder(formData: FormData) {
   const validationError = validateCheckoutDetails(details);
   if (validationError) back(validationError);
 
+  const promoCode = getString(formData, "promo_code");
   let orderId = "";
   try {
-    const totals = await getCheckoutTotals(user.id);
+    const totals = await getCheckoutTotals(user.id, promoCode || null);
     orderId = await insertOrderWithItems({
       supabase,
       userId: user.id,
@@ -277,6 +318,15 @@ export async function placeOrder(formData: FormData) {
       totals,
       paymentMethod: "cash_on_delivery",
     });
+    if (totals.promoCodeId) {
+      try {
+        await supabase.rpc("increment_promo_use", {
+          promo_id: totals.promoCodeId,
+        });
+      } catch {
+        /* best-effort — order already saved */
+      }
+    }
   } catch {
     back("We couldn't place your order. Please try again.");
   }
@@ -318,9 +368,10 @@ export async function createStripePaymentIntent(
 
   const orderId = crypto.randomUUID();
   let paymentIntentId = "";
+  const promoCode = getString(formData, "promo_code");
 
   try {
-    const totals = await getCheckoutTotals(user.id);
+    const totals = await getCheckoutTotals(user.id, promoCode || null);
     const paymentIntent = await createStripeIntent({
       secretKey,
       orderId,

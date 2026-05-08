@@ -31,7 +31,6 @@ export default function ProductPurchasePanel({
   const [isPending, startTransition] = useTransition();
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
-  const [tileBusyId, setTileBusyId] = useState<string | null>(null);
 
   const selectedScent = useMemo(
     () => primaryScents.find((s) => s.id === scentId) ?? null,
@@ -39,20 +38,6 @@ export default function ProductPurchasePanel({
   );
 
   const canAdd = Boolean(scentId) && !adding && !isPending;
-
-  async function quickAdd(scent: ScentRow) {
-    if (tileBusyId) return;
-    setTileBusyId(scent.id);
-    setScentId(scent.id);
-    setAdded(false);
-    try {
-      await addToCart(productId, scent.id, 1);
-      setAdded(true);
-      startTransition(() => router.refresh());
-    } finally {
-      setTileBusyId(null);
-    }
-  }
 
   async function onAdd() {
     if (!scentId) return;
@@ -86,7 +71,13 @@ export default function ProductPurchasePanel({
 
       <fieldset className="scentPicker">
         <legend className="scentPickerHeader">
-          <span className="eyebrow">Choose Scent</span>
+          <span className="eyebrow">
+            Choose your scent
+            <span className="scentPickerCount">
+              {primaryScents.length}{" "}
+              {primaryScents.length === 1 ? "option" : "options"}
+            </span>
+          </span>
           {selectedScent && (
             <span className="scentSelected">{selectedScent.name}</span>
           )}
@@ -106,32 +97,24 @@ export default function ProductPurchasePanel({
                   type="button"
                 >
                   {img ? (
-                    <Image
-                      alt=""
-                      fill
-                      sizes="96px"
-                      src={img}
-                    />
+                    <Image alt="" fill sizes="96px" src={img} />
                   ) : (
                     <span className="scentTileSwatch">
-                      <span style={{ background: scentSwatchColor(s.slug) }} />
+                      <span
+                        style={{ background: scentSwatchColor(s.slug) }}
+                      />
                     </span>
                   )}
                 </button>
                 <span className="scentTileName">{s.name}</span>
-                <button
-                  aria-label={`Add ${s.name} to bag`}
-                  className="scentTileBag"
-                  disabled={tileBusyId !== null}
-                  onClick={() => quickAdd(s)}
-                  type="button"
-                >
-                  {tileBusyId === s.id ? "…" : "+ Bag"}
-                </button>
               </div>
             );
           })}
         </div>
+
+        {selectedScent?.description && (
+          <p className="scentDescription">{selectedScent.description}</p>
+        )}
       </fieldset>
 
       <div className="flex items-center gap-4">
@@ -160,7 +143,7 @@ export default function ProductPurchasePanel({
       <div className="productPriceRow">
         <span className="productPrice">{priceLabel}</span>
         <span className="productPriceNote">
-          Ships in reusable glass · Free over €60
+          Ships in reusable glass · Free over E£1,500
         </span>
       </div>
 
@@ -170,7 +153,13 @@ export default function ProductPurchasePanel({
         onClick={onAdd}
         type="button"
       >
-        {adding ? "Adding to bag…" : added ? "Added to bag" : "Add to bag"}
+        {adding
+          ? "Adding to bag…"
+          : added
+            ? "Added to bag"
+            : selectedScent
+              ? `Add ${selectedScent.name} to bag`
+              : "Add to bag"}
       </button>
     </div>
   );

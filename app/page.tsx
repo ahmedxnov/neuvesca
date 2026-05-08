@@ -97,9 +97,9 @@ export default async function Home() {
               <div className="productInfo">
                 <h3>{product.name}</h3>
                 <p>{product.description}</p>
-                <div>
-                  <span>{formatPrice(product.price_cents, product.currency)}</span>
-                  <span>View notes</span>
+                <div className="productCardFooter">
+                  <span className="productCardPrice">{formatPrice(product.price_cents, product.currency)}</span>
+                  <span className="productCardCta">View notes →</span>
                 </div>
               </div>
             </Link>

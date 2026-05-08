@@ -440,43 +440,98 @@ p {
   margin: 0;
 }
 
-.productInfo > div {
+.productCardScents {
   align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.2rem;
+}
+
+.productCardScents ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.productCardScents ul li {
+  background: var(--cream);
+  border: 1px solid var(--paper);
+  border-radius: 999px;
+  height: 1.7rem;
+  width: 1.7rem;
+  margin-left: -0.4rem;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 1px 2px rgba(31, 26, 20, 0.05);
+  transition: transform 280ms ease;
+}
+
+.productCardScents ul li:first-child {
+  margin-left: 0;
+}
+
+.productCard:hover .productCardScents ul li {
+  transform: translateY(-1px);
+}
+
+.productCardScents ul li > span {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.productCardScentMore {
+  align-items: center;
+  background: var(--paper) !important;
+  color: var(--ink-soft);
+  display: flex;
+  font-family: var(--sans);
+  font-size: 0.6rem;
+  font-weight: 500;
+  justify-content: center;
+  letter-spacing: 0.04em;
+}
+
+.productCardScents > span {
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.productCardFooter {
+  align-items: baseline;
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  margin-top: 0.4rem;
-  padding-top: 0.9rem;
+  margin-top: 0.5rem;
+  padding-top: 0.95rem;
   border-top: 1px solid var(--line-soft);
 }
 
-.productInfo > div > span {
-  color: var(--muted);
-  font-size: 0.68rem;
+.productCardPrice {
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-style: italic;
   font-weight: 400;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
 }
 
-.productInfo button {
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--ink);
+.productCardCta {
   color: var(--ink);
-  cursor: pointer;
+  font-family: var(--sans);
   font-size: 0.68rem;
   font-weight: 500;
   letter-spacing: 0.26em;
-  min-height: 0;
-  padding: 0 0 0.35rem;
   text-transform: uppercase;
-  white-space: nowrap;
-  transition: color 220ms ease, border-color 220ms ease;
+  transition: color 220ms ease, transform 280ms ease;
 }
 
-.productInfo button:hover {
+.productCard:hover .productCardCta {
   color: var(--clay);
-  border-color: var(--clay);
+  transform: translateX(2px);
 }
 
 /* ─── Ingredients gallery ──────────────────────────────────── */
@@ -895,6 +950,17 @@ p {
   overflow-wrap: anywhere;
 }
 
+.protectedActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1.6rem;
+}
+
+.protectedActions form {
+  margin: 0;
+}
+
 /* ─── Shop bar / filters ───────────────────────────────────── */
 .shopBar {
   display: flex;
@@ -943,12 +1009,62 @@ p {
   text-transform: uppercase;
 }
 
+.shopHint {
+  color: var(--ink-soft);
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  font-style: italic;
+}
+
 .shopGrid {
   padding-top: clamp(3.5rem, 6vw, 6rem);
 }
 
 .productGridFull {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.6rem, 2.6vw, 2.6rem) clamp(1.1rem, 1.8vw, 1.8rem);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.productGridFull .productCard {
+  gap: 1.1rem;
+}
+
+.productGridFull .productVisual {
+  aspect-ratio: 3 / 4;
+  padding: 14% 14% 16%;
+}
+
+.productGridFull .productInfo {
+  gap: 0.5rem;
+}
+
+.productGridFull .productInfo h3 {
+  font-size: 1.25rem;
+}
+
+.productGridFull .productInfo > p {
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.productGridFull .productCardScents ul li {
+  height: 1.5rem;
+  width: 1.5rem;
+  margin-left: -0.35rem;
+}
+
+.productGridFull .productCardScents > span {
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+}
+
+.productGridFull .productCardPrice {
+  font-size: 1.05rem;
+}
+
+.productGridFull .productCardCta {
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
 }
 
 /* ─── About page ───────────────────────────────────────────── */
@@ -1453,31 +1569,24 @@ p {
   text-align: center;
 }
 
-.scentTileBag {
-  background: transparent;
-  border: 1px solid var(--line);
-  color: var(--ink-soft);
-  cursor: pointer;
+.scentPickerCount {
+  color: var(--muted);
   font-family: var(--sans);
-  font-size: 0.6rem;
-  font-weight: 500;
-  letter-spacing: 0.28em;
-  padding: 0.45rem 0.5rem;
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  margin-left: 0.6rem;
   text-transform: uppercase;
-  transition: background 220ms ease, border-color 220ms ease, color 220ms ease;
 }
 
-.scentTileBag:hover:not(:disabled),
-.scentTileBag:focus-visible {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: var(--cream);
-  outline: none;
-}
-
-.scentTileBag:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
+.scentDescription {
+  color: var(--ink-soft);
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-style: italic;
+  line-height: 1.7;
+  margin: 0.4rem 0 0;
+  max-width: 36rem;
 }
 
 /* ─── Quantity stepper ─────────────────────────────────────── */
@@ -1842,37 +1951,6 @@ p {
   max-width: 32rem;
 }
 
-.scentChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-}
-
-.scentChip {
-  background: transparent;
-  border: 1px solid var(--line);
-  color: var(--muted);
-  cursor: pointer;
-  font-family: var(--sans);
-  font-size: 0.66rem;
-  font-weight: 500;
-  letter-spacing: 0.28em;
-  padding: 0.55rem 1rem;
-  text-transform: uppercase;
-  transition: background 220ms ease, border-color 220ms ease, color 220ms ease;
-}
-
-.scentChip:hover {
-  border-color: var(--ink-soft);
-  color: var(--ink);
-}
-
-.scentChip.active {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: var(--cream);
-}
-
 /* ─── Contact refinement ───────────────────────────────────── */
 .contactDetails .contactItem {
   border-bottom: 1px solid var(--line-soft);
@@ -2141,5 +2219,667 @@ p {
     padding: 0.5rem 0.85rem;
     font-size: 0.62rem;
     letter-spacing: 0.2em;
+  }
+}
+
+/* ─── Cart promo input ────────────────────────────────────────── */
+.cartPromo {
+  border-bottom: 1px solid var(--line-soft);
+  display: grid;
+  gap: 0.45rem;
+  margin-bottom: 1.1rem;
+  padding-bottom: 1rem;
+}
+
+.cartPromoForm {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.cartPromoForm input {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  flex: 1;
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  min-width: 0;
+  padding: 0.65rem 0.8rem;
+}
+
+.cartPromoForm input:focus {
+  border-color: var(--ink);
+  outline: none;
+}
+
+.cartPromoApply {
+  background: var(--ink);
+  border: 0;
+  color: var(--cream);
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  padding: 0 1rem;
+  text-transform: uppercase;
+}
+
+.cartPromoApply:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.cartPromoApplied {
+  align-items: center;
+  background: var(--cream);
+  border: 1px dashed var(--ink-soft);
+  display: flex;
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  justify-content: space-between;
+  padding: 0.6rem 0.85rem;
+}
+
+.cartPromoApplied strong {
+  letter-spacing: 0.06em;
+}
+
+.cartPromoClear {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.cartPromoMessage {
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin: 0;
+}
+
+/* ─── Admin dashboard ─────────────────────────────────────────── */
+.adminShell {
+  --admin-bg: #f6f3ec;
+  --admin-surface: #ffffff;
+  --admin-line: #e7e1d4;
+  --admin-line-soft: #efeadd;
+  --admin-ink: #1f1a14;
+  --admin-ink-soft: #4b4339;
+  --admin-muted: #8a7e6f;
+  --admin-accent: #1f1a14;
+
+  background: var(--admin-bg);
+  color: var(--admin-ink);
+  display: grid;
+  font-family: var(--sans);
+  grid-template-columns: 250px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.adminSidebar {
+  background: var(--admin-surface);
+  border-right: 1px solid var(--admin-line);
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  min-height: 100vh;
+  padding: 1.6rem 1.1rem;
+  position: sticky;
+  top: 0;
+}
+
+.adminBrand {
+  align-items: center;
+  border-bottom: 1px solid var(--admin-line-soft);
+  color: var(--admin-ink);
+  display: flex;
+  gap: 0.8rem;
+  padding: 0 0.5rem 1.1rem;
+  text-decoration: none;
+}
+
+.adminBrandMark {
+  align-items: center;
+  background: var(--admin-ink);
+  border-radius: 8px;
+  color: var(--cream);
+  display: grid;
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-style: italic;
+  height: 2rem;
+  justify-items: center;
+  width: 2rem;
+}
+
+.adminBrandTitle {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-style: italic;
+  line-height: 1.1;
+}
+
+.adminBrandSub {
+  color: var(--admin-muted);
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.adminNav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.adminNavLink {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--admin-ink-soft);
+  display: flex;
+  font-size: 0.85rem;
+  font-weight: 500;
+  gap: 0.7rem;
+  padding: 0.7rem 0.85rem;
+  text-decoration: none;
+  transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
+}
+
+.adminNavLink svg {
+  color: var(--admin-muted);
+  transition: color 180ms ease;
+}
+
+.adminNavLink:hover {
+  background: var(--admin-line-soft);
+  color: var(--admin-ink);
+}
+
+.adminNavLink:hover svg {
+  color: var(--admin-ink);
+}
+
+.adminNavLinkActive,
+.adminNavLinkActive:hover {
+  background: var(--admin-ink);
+  border-color: var(--admin-ink);
+  color: #faf4e8;
+}
+
+.adminNavLinkActive svg,
+.adminNavLinkActive:hover svg {
+  color: #faf4e8;
+}
+
+.adminProfile {
+  align-items: center;
+  border-top: 1px solid var(--admin-line-soft);
+  display: flex;
+  gap: 0.7rem;
+  margin-top: auto;
+  padding: 1rem 0.5rem 0;
+}
+
+.adminProfileAvatar {
+  align-items: center;
+  background: var(--admin-line-soft);
+  border-radius: 999px;
+  color: var(--admin-ink);
+  display: grid;
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  height: 2.1rem;
+  justify-items: center;
+  width: 2.1rem;
+}
+
+.adminProfileMeta {
+  display: grid;
+  line-height: 1.2;
+  min-width: 0;
+}
+
+.adminProfileName {
+  color: var(--admin-ink);
+  font-size: 0.85rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adminProfileEmail {
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adminMain {
+  padding: 1.8rem clamp(1.25rem, 2.5vw, 2.4rem) 3rem;
+}
+
+.adminPageHead {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1.6rem;
+}
+
+.adminPageHead h1 {
+  color: var(--admin-ink);
+  font-family: var(--serif);
+  font-size: clamp(1.8rem, 2.4vw, 2.4rem);
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  margin: 0.2rem 0 0;
+}
+
+.adminPageHead .eyebrow {
+  color: var(--admin-muted);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.adminPageHead p {
+  color: var(--admin-muted);
+  font-size: 0.92rem;
+  margin: 0.3rem 0 0;
+  max-width: 56ch;
+}
+
+/* Cards / panels */
+.adminCard {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-line);
+  border-radius: 12px;
+  padding: 1.4rem;
+}
+
+.adminStatGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  margin-bottom: 1.5rem;
+}
+
+.adminStatCard {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-line);
+  border-radius: 12px;
+  display: grid;
+  gap: 0.5rem;
+  padding: 1.2rem 1.3rem;
+}
+
+.adminStatCard .adminStatLabel {
+  align-items: center;
+  color: var(--admin-muted);
+  display: flex;
+  font-size: 0.68rem;
+  font-weight: 500;
+  gap: 0.55rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.adminStatCard .adminStatLabel svg {
+  color: var(--admin-ink);
+}
+
+.adminStatValue {
+  color: var(--admin-ink);
+  font-family: var(--serif);
+  font-size: 2rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+
+.adminStatHint {
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+}
+
+.adminPanelGrid {
+  display: grid;
+  gap: 1.2rem;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+}
+
+.adminPanelHead {
+  align-items: center;
+  border-bottom: 1px solid var(--admin-line-soft);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.7rem;
+}
+
+.adminPanelHead h2 {
+  color: var(--admin-ink);
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.adminPanelHead a {
+  color: var(--admin-ink);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.adminPanelHead a:hover {
+  color: var(--clay);
+}
+
+/* Tables */
+.adminTableWrap {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.adminTable {
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  width: 100%;
+}
+
+.adminTable th,
+.adminTable td {
+  padding: 0.85rem 1.1rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.adminTable th {
+  background: var(--admin-line-soft);
+  color: var(--admin-muted);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.adminTable tbody tr {
+  border-top: 1px solid var(--admin-line-soft);
+}
+
+.adminTable tbody tr:hover {
+  background: #fbfaf6;
+}
+
+.adminTable td {
+  color: var(--admin-ink);
+}
+
+.adminTable td.adminMuted {
+  color: var(--admin-muted);
+}
+
+.adminTable a {
+  color: var(--admin-ink);
+  text-decoration: none;
+}
+
+.adminTable a:hover {
+  color: var(--clay);
+}
+
+.adminEmpty {
+  color: var(--admin-muted);
+  padding: 2rem;
+  text-align: center;
+}
+
+/* Badges */
+.adminBadge {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 0.66rem;
+  font-weight: 600;
+  gap: 0.35rem;
+  letter-spacing: 0.16em;
+  padding: 0.32rem 0.7rem;
+  text-transform: uppercase;
+}
+
+.adminBadge.adminBadgeNeutral {
+  background: var(--admin-line-soft);
+  color: var(--admin-ink-soft);
+}
+
+.adminBadge.adminBadgeOk {
+  background: #e6f1e1;
+  color: #2f5a23;
+}
+
+.adminBadge.adminBadgeWarn {
+  background: #fbe9c8;
+  color: #6e4a06;
+}
+
+.adminBadge.adminBadgeAlert {
+  background: #f7d8d4;
+  color: #6e2c25;
+}
+
+.adminBadge.adminBadgeMuted {
+  background: var(--admin-line-soft);
+  color: var(--admin-muted);
+}
+
+/* Forms */
+.adminForm {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.adminFormRow {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.adminFormGrid {
+  display: grid;
+  gap: 1.1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.adminFormGrid.adminFormGrid3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.adminFormLabel {
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.adminInput,
+.adminSelect,
+.adminTextarea {
+  background: #fff;
+  border: 1px solid var(--admin-line);
+  border-radius: 8px;
+  color: var(--admin-ink);
+  font-family: var(--sans);
+  font-size: 0.92rem;
+  padding: 0.65rem 0.85rem;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+  width: 100%;
+}
+
+.adminInput:focus,
+.adminSelect:focus,
+.adminTextarea:focus {
+  border-color: var(--admin-ink);
+  box-shadow: 0 0 0 3px rgba(31, 26, 20, 0.07);
+  outline: none;
+}
+
+.adminTextarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.adminCheckRow {
+  align-items: center;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.adminButtonRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: flex-end;
+}
+
+.adminButton {
+  align-items: center;
+  background: #fff;
+  border: 1px solid var(--admin-line);
+  border-radius: 8px;
+  color: var(--admin-ink);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  gap: 0.45rem;
+  padding: 0.6rem 1rem;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.adminButton:hover:not(:disabled) {
+  background: var(--admin-line-soft);
+}
+
+.adminButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.adminButton.adminButtonPrimary {
+  background: var(--admin-ink);
+  border-color: var(--admin-ink);
+  color: #faf4e8;
+}
+
+.adminButton.adminButtonPrimary:hover:not(:disabled) {
+  background: #2c241c;
+}
+
+.adminButton.adminButtonDanger {
+  background: #fff;
+  border-color: #d97a6c;
+  color: #a3402f;
+}
+
+.adminButton.adminButtonDanger:hover:not(:disabled) {
+  background: #fbe5e0;
+}
+
+.adminToast {
+  background: var(--admin-line-soft);
+  border-left: 3px solid var(--admin-ink);
+  color: var(--admin-ink-soft);
+  font-size: 0.85rem;
+  padding: 0.65rem 0.9rem;
+}
+
+/* Layout helpers */
+.adminSplit {
+  display: grid;
+  gap: 1.2rem;
+  grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
+}
+
+.adminList {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-line);
+  border-radius: 12px;
+  display: grid;
+  max-height: 70vh;
+  overflow: auto;
+  padding: 0.4rem;
+}
+
+.adminListItem {
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  color: var(--admin-ink-soft);
+  cursor: pointer;
+  display: grid;
+  font-family: var(--sans);
+  font-size: 0.88rem;
+  gap: 0.15rem;
+  padding: 0.65rem 0.8rem;
+  text-align: left;
+  width: 100%;
+}
+
+.adminListItem:hover {
+  background: var(--admin-line-soft);
+}
+
+.adminListItemActive,
+.adminListItemActive:hover {
+  background: var(--admin-ink);
+  color: #faf4e8;
+}
+
+.adminListItem small {
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+}
+
+.adminListItemActive small {
+  color: rgba(250, 244, 232, 0.7);
+}
+
+@media (max-width: 900px) {
+  .adminShell {
+    grid-template-columns: 1fr;
+  }
+  .adminSidebar {
+    border-bottom: 1px solid var(--admin-line);
+    border-right: 0;
+    flex-direction: column;
+    min-height: 0;
+    position: static;
+  }
+  .adminPanelGrid,
+  .adminFormGrid,
+  .adminFormGrid.adminFormGrid3,
+  .adminSplit {
+    grid-template-columns: 1fr;
   }
 }
