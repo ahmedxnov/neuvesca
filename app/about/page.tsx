@@ -23,7 +23,7 @@ const principles = [
     body: "Carefully chosen materials, each selected for their quality, purity, and the way they elevate every pour.",
   },
 ];
-
+      //islam
 export default function AboutPage() {
   return (
     <>
